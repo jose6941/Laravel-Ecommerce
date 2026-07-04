@@ -1,59 +1,88 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Ecommerce em Laravel
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Este é um projeto completo de Ecommerce desenvolvido em Laravel, criado com foco em simplicidade, boas práticas e facilidade de manutenção. A estrutura foi pensada para ser direta, evitando camadas excessivas de abstração, ideal para apresentações técnicas.
 
-## About Laravel
+## Tecnologias Utilizadas
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **PHP 8.2+**
+- **Laravel 12**
+- **Breeze (Autenticação)**
+- **Banco de Dados Relacional** (MySQL / SQLite / PostgreSQL configurado via `.env`)
+- **Sanctum** (Para tokens de API)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+---
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Como Configurar e Rodar o Projeto
 
-## Learning Laravel
+Siga os passos abaixo para iniciar o projeto localmente:
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+1. **Instale as dependências do PHP:**
+   ```bash
+   composer install
+   ```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+2. **Instale as dependências do Node (Frontend):**
+   ```bash
+   npm install
+   npm run build
+   ```
 
-## Laravel Sponsors
+3. **Configure o ambiente:**
+   Copie o arquivo `.env.example` para `.env` e configure os dados do seu banco de dados local.
+   ```bash
+   cp .env.example .env
+   ```
+   *Dica: Caso use SQLite, apenas crie o arquivo `database/database.sqlite` e configure o `DB_CONNECTION=sqlite` no `.env`.*
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+4. **Gere a chave da aplicação e rode as migrações:**
+   Isso criará todas as tabelas no seu banco de dados de uma vez.
+   ```bash
+   php artisan key:generate
+   php artisan migrate
+   ```
 
-### Premium Partners
+5. **Inicie o Servidor Local:**
+   ```bash
+   php artisan serve
+   ```
+   Acesse no navegador: `http://localhost:8000`
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+---
 
-## Contributing
+## Lógica e Arquitetura do Projeto
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Para facilitar a sua apresentação, aqui está o resumo de como a lógica foi construída e estruturada:
 
-## Code of Conduct
+### 1. Modelagem de Dados (Banco)
+Todo o banco foi criado pensando num padrão semântico em português.
+- **`usuarios` e `enderecos`**: Guardam os dados de quem está comprando e onde o pedido deve ser entregue.
+- **`produtos`, `categorias`, `imagens_produto` e `avaliacoes`**: Organização do catálogo da loja. A categoria possui auto-relacionamento (uma categoria pode ter uma categoria pai).
+- **`carrinhos` e `itens_carrinho`**: Registram o que o usuário quer comprar antes de finalizar.
+- **`cupons`**: Sistema simples de descontos, permitindo valor fixo ou porcentagem.
+- **`pedidos` e `itens_pedido`**: Registram o momento em que a compra é fechada. **Atenção aqui:** os itens do pedido possuem os preços "fotografados". Se o preço do produto original mudar depois, o valor pago no histórico do pedido não será alterado.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### 2. A Lógica do Carrinho
+Centralizada no `CarrinhoController`.
+Quando um usuário adiciona um produto:
+- O sistema verifica se ele já tem um carrinho aberto.
+- Se o produto já está lá, apenas aumenta a quantidade.
+- Caso contrário, cria um novo item atrelando ao preço promocional (ou normal) do momento.
+- Toda essa validação ocorre de forma direta para manter o fluxo fácil de entender, sem precisar navegar por várias camadas de "Services".
 
-## Security Vulnerabilities
+### 3. O Fluxo de Checkout (Finalização de Compra)
+A lógica mais importante do e-commerce está no `CheckoutController`. 
+Para garantir a integridade dos dados (como não deixar um pedido ser gerado sem baixar o estoque corretamente), utilizamos as **Transações de Banco de Dados (`DB::transaction`)**:
+- O sistema calcula o subtotal com base nos itens.
+- Valida o cupom de desconto (caso o usuário tenha inserido um).
+- Cria o registro na tabela de `pedidos` (copiando os dados do endereço de entrega de forma definitiva para o pedido).
+- Varre o carrinho, salva tudo em `itens_pedido` e, crucialmente, **diminui o estoque daquele produto**.
+- Por fim, limpa o carrinho antigo do usuário.
+- Se qualquer erro acontecer durante esse processo, a transação é desfeita de forma segura (Rollback) garantindo que nenhum dinheiro seja cobrado indevidamente ou produto fique travado.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### 4. Segurança Adotada
+- **Proteção contra Mass Assignment:** Todos os Models usam as propriedades `$fillable` com rigor, para evitar que um usuário mal-intencionado force a injeção de parâmetros (como virar "admin" no meio do cadastro).
+- **Validações Diretas:** Uso do Form Request Validation injetado, obrigando tipos certos (ex: quantidade mínima, textos e e-mails autênticos).
+- **Autorização (Auth):** Áreas críticas como Checkout, Carrinho e Painel de Controle possuem Middlewares bloqueando o acesso de visitantes. O sistema sempre cruza o ID do usuário logado (`Auth::id()`) com o dono dos dados requeridos para barrar acessos indevidos.
 
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+---
+*Este sistema foca no principal valor de um MVP: o fluxo limpo, seguro e funcional.*
