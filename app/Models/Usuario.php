@@ -37,4 +37,19 @@ class Usuario extends Authenticatable
     public function pedidos()    { return $this->hasMany(Pedido::class); }
     public function avaliacoes() { return $this->hasMany(Avaliacao::class); }
     public function enderecos()  { return $this->hasMany(Endereco::class); }
+
+    public function getAuthPassword(): string
+    {
+        return $this->senha;
+    }
+
+    public function getNameAttribute(): ?string
+    {
+        return $this->attributes['nome'] ?? null;
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->perfil === 'admin';
+    }
 }

@@ -11,6 +11,7 @@ class ProdutoController extends Controller
     public function index(Request $request)
     {
         $produtos = Produto::ativo()
+            ->with(['categoria', 'imagens'])
             ->when($request->filled('categoria'), fn ($q) =>
                 $q->whereHas('categoria', fn ($c) => $c->where('slug', $request->categoria)))
             ->when($request->filled('q'), fn ($q) =>
@@ -31,6 +32,7 @@ class ProdutoController extends Controller
 
     public function store(Request $request)
     {
+        // Simplificado para Junior: Validação direta no controller
         $dados = $request->validate([
             'categoria_id' => 'required|exists:categorias,id',
             'nome' => 'required|string|max:255',

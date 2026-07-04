@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ProfileUpdateRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -13,18 +14,18 @@ class PerfilController extends Controller
     public function edit(Request $request): View
     {
         return view('profile.edit', [
-            'usuario' => $request->user(),
+            'user' => $request->user(),
         ]);
     }
 
-    public function update(Request $request): RedirectResponse
+    public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->validate([
-            'nome' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:usuarios,email,'.$request->user()->id],
-        ]);
+        $validated = $request->validated();
 
-        $request->user()->fill($request->all());
+        $request->user()->fill([
+            'nome' => $validated['name'],
+            'email' => $validated['email'],
+        ]);
 
         if ($request->user()->isDirty('email')) {
             $request->user()->email_verified_at = null;
@@ -38,7 +39,7 @@ class PerfilController extends Controller
     public function destroy(Request $request): RedirectResponse
     {
         $request->validateWithBag('userDeletion', [
-            'senha' => ['required', 'current_password'],
+            'password' => ['required', 'current_password'],
         ]);
 
         $usuario = $request->user();

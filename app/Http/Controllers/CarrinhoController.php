@@ -39,7 +39,9 @@ class CarrinhoController extends Controller
 
     public function update(ItemCarrinho $item, Request $request)
     {
-        $this->authorize('update', $item); // Opcional, pode checar se item pertence ao usuario
+        $this->garantirQueItemPertenceAoCarrinhoAtual($item);
+
+        $request->validate(['quantidade' => 'required|integer|min:1']);
 
         $item->update(['quantidade' => $request->quantidade]);
 
@@ -48,9 +50,22 @@ class CarrinhoController extends Controller
 
     public function destroy(ItemCarrinho $item)
     {
+        $this->garantirQueItemPertenceAoCarrinhoAtual($item);
+
         $item->delete();
 
         return back()->with('success', 'Produto removido do carrinho.');
+    }
+
+    /**
+     * Garante que o item de carrinho pertence ao usuário/sessão atual,
+     * evitando que alguém manipule itens de carrinho de outra pessoa.
+     */
+    private function garantirQueItemPertenceAoCarrinhoAtual(ItemCarrinho $item): void
+    {
+        $carrinhoAtual = $this->obterCarrinho();
+
+        abort_unless($carrinhoAtual && $item->carrinho_id === $carrinhoAtual->id, 403);
     }
 
     private function obterCarrinho($criarSeNaoExistir = false)
