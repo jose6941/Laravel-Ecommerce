@@ -5,6 +5,8 @@ use App\Http\Controllers\InicioController;
 use App\Http\Controllers\ProdutoController;
 use App\Http\Controllers\CarrinhoController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [InicioController::class, 'index'])->name('home');
@@ -27,4 +29,9 @@ Route::middleware('auth')->group(function () {
     Route::delete('/perfil', [PerfilController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__.'/auth.php';
+Route::middleware('guest')->group(function () {
+    Route::get('registrar', [RegisteredUserController::class, 'create'])->name('register');
+    Route::post('registrar', [RegisteredUserController::class, 'store']);
+    Route::get('login', [AuthenticatedSessionController::class, 'create'])->name('login');
+    Route::post('login', [AuthenticatedSessionController::class, 'store']);
+});
