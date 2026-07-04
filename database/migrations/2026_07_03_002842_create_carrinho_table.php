@@ -11,21 +11,21 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('carts', function (Blueprint $table) {
+        Schema::create('carrinhos', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->nullable()->constrained()->cascadeOnDelete();
-            $table->string('session_id')->nullable()->index(); // usado por visitantes
+            $table->foreignId('usuario_id')->nullable()->constrained('usuarios')->cascadeOnDelete();
+            $table->string('sessao_id')->nullable()->index(); // usado por visitantes
             $table->timestamps();
         });
 
-        Schema::create('cart_items', function (Blueprint $table) {
+        Schema::create('itens_carrinho', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('cart_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('produtos_id')->constrained()->cascadeOnDelete();
-            $table->unsignedInteger('quantity')->default(1);
-            $table->decimal('unit_price', 10, 2); // preço "fotografado" no momento
+            $table->foreignId('carrinho_id')->constrained('carrinhos')->cascadeOnDelete();
+            $table->foreignId('produto_id')->constrained('produtos')->cascadeOnDelete();
+            $table->unsignedInteger('quantidade')->default(1);
+            $table->decimal('preco_unitario', 10, 2); // preço "fotografado" no momento
             $table->timestamps();
-            $table->unique(['cart_id', 'produtos_id']); // não duplica o mesmo produto no carrinho
+            $table->unique(['carrinho_id', 'produto_id']); // não duplica o mesmo produto no carrinho
         });
     }
 
@@ -34,7 +34,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('carts');
-        Schema::dropIfExists('cart_items');
+        Schema::dropIfExists('carrinhos');
+        Schema::dropIfExists('itens_carrinho');
     }
 };

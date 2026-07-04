@@ -11,15 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('reviews', function (Blueprint $table) {
+        Schema::create('avaliacoes', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('produtos_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->unsignedTinyInteger('rating'); // 1 a 5
-            $table->text('comment')->nullable();
-            $table->boolean('is_approved')->default(false);
+            $table->foreignId('produto_id')->constrained('produtos')->cascadeOnDelete();
+            $table->foreignId('usuario_id')->constrained('usuarios')->cascadeOnDelete();
+            $table->unsignedTinyInteger('nota'); // 1 a 5
+            $table->text('comentario')->nullable();
+            $table->boolean('aprovado')->default(false);
             $table->timestamps();
-            $table->unique(['produtos_id', 'user_id']); // 1 avaliação por cliente/produto
+            $table->unique(['produto_id', 'usuario_id']); // 1 avaliação por cliente/produto
         });
     }
 
@@ -28,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('reviews');
+        Schema::dropIfExists('avaliacoes');
     }
 };

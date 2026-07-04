@@ -13,16 +13,16 @@ return new class extends Migration
     {
         Schema::create('produtos', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('categorias_id')->constrained()->cascadeOnDelete();
-            $table->string('name');
+            $table->foreignId('categoria_id')->constrained('categorias')->cascadeOnDelete();
+            $table->string('nome');
             $table->string('slug')->unique();
             $table->string('sku')->unique();
-            $table->text('description')->nullable();
-            $table->decimal('price', 10, 2);
-            $table->decimal('promotional_price', 10, 2)->nullable();
-            $table->unsignedInteger('stock')->default(0);
-            $table->boolean('is_active')->default(true);
-            $table->boolean('is_featured')->default(false);
+            $table->text('descricao')->nullable();
+            $table->decimal('preco', 10, 2);
+            $table->decimal('preco_promocional', 10, 2)->nullable();
+            $table->unsignedInteger('estoque')->default(0);
+            $table->boolean('ativo')->default(true);
+            $table->boolean('destaque')->default(false);
             $table->timestamps();
             $table->softDeletes(); 
         });

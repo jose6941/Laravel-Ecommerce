@@ -9,44 +9,44 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    // product_images
+    // imagens_produto
     public function up(): void
     {
-        Schema::create('product_images', function (Blueprint $table) {
+        Schema::create('imagens_produto', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('produtos_id')->constrained()->cascadeOnDelete();
-            $table->string('path');
-            $table->boolean('is_main')->default(false);
-            $table->unsignedSmallInteger('sort_order')->default(0);
+            $table->foreignId('produto_id')->constrained('produtos')->cascadeOnDelete();
+            $table->string('caminho');
+            $table->boolean('principal')->default(false);
+            $table->unsignedSmallInteger('ordem')->default(0);
             $table->timestamps();
         });
 
-        // addresses
-        Schema::create('addresses', function (Blueprint $table) {
+        // enderecos
+        Schema::create('enderecos', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->string('label')->default('Principal');
-            $table->string('zip_code', 9);
-            $table->string('street');
-            $table->string('number');
-            $table->string('complement')->nullable();
-            $table->string('neighborhood');
-            $table->string('city');
-            $table->string('state', 2);
-            $table->boolean('is_default')->default(false);
+            $table->foreignId('usuario_id')->constrained('usuarios')->cascadeOnDelete();
+            $table->string('rotulo')->default('Principal');
+            $table->string('cep', 9);
+            $table->string('rua');
+            $table->string('numero');
+            $table->string('complemento')->nullable();
+            $table->string('bairro');
+            $table->string('cidade');
+            $table->string('estado', 2);
+            $table->boolean('padrao')->default(false);
             $table->timestamps();
         });
 
-        // coupons
-        Schema::create('coupons', function (Blueprint $table) {
+        // cupons
+        Schema::create('cupons', function (Blueprint $table) {
             $table->id();
-            $table->string('code')->unique();
-            $table->enum('type', ['percentage', 'fixed'])->default('percentage');
-            $table->decimal('value', 10, 2);
-            $table->unsignedInteger('max_uses')->nullable();
-            $table->unsignedInteger('used_count')->default(0);
-            $table->timestamp('expires_at')->nullable();
-            $table->boolean('is_active')->default(true);
+            $table->string('codigo')->unique();
+            $table->enum('tipo', ['porcentagem', 'fixo'])->default('porcentagem');
+            $table->decimal('valor', 10, 2);
+            $table->unsignedInteger('maximo_usos')->nullable();
+            $table->unsignedInteger('usos')->default(0);
+            $table->timestamp('expira_em')->nullable();
+            $table->boolean('ativo')->default(true);
             $table->timestamps();
         });
     }
@@ -56,8 +56,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('product_images');
-        Schema::dropIfExists('addresses');
-        Schema::dropIfExists('coupons');
+        Schema::dropIfExists('imagens_produto');
+        Schema::dropIfExists('enderecos');
+        Schema::dropIfExists('cupons');
     }
 };
