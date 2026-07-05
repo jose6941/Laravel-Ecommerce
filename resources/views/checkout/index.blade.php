@@ -1,16 +1,19 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+        <h2 class="font-display font-semibold text-2xl text-gray-900">
             {{ __('Finalizar compra') }}
         </h2>
     </x-slot>
 
-    <div class="py-12">
+    <div class="py-10">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8 space-y-6">
 
             @if ($enderecos->isEmpty())
-                <div class="bg-white shadow-sm rounded-lg p-6">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-3">Cadastrar endereço de entrega</h3>
+                <div class="bg-white border border-gray-100 shadow-sm rounded-2xl p-6">
+                    <h3 class="font-display font-semibold text-gray-900 mb-4">
+                        <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-violet-600 text-white text-xs mr-2">1</span>
+                        Cadastrar endereço de entrega
+                    </h3>
                     <form method="POST" action="{{ route('enderecos.store') }}" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         @csrf
                         <div class="sm:col-span-2">
@@ -52,21 +55,24 @@
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('checkout.store') }}" class="bg-white shadow-sm rounded-lg p-6 space-y-6">
+            <form method="POST" action="{{ route('checkout.store') }}" class="bg-white border border-gray-100 shadow-sm rounded-2xl p-6 space-y-8">
                 @csrf
 
                 {{-- Resumo do pedido --}}
                 <div>
-                    <h3 class="text-lg font-semibold text-gray-900 mb-3">Resumo do pedido</h3>
-                    <div class="divide-y border rounded-md">
+                    <h3 class="font-display font-semibold text-gray-900 mb-3">
+                        <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-violet-600 text-white text-xs mr-2">2</span>
+                        Resumo do pedido
+                    </h3>
+                    <div class="divide-y divide-gray-100 border border-gray-100 rounded-xl overflow-hidden">
                         @foreach ($carrinho->itens as $item)
-                            <div class="flex justify-between px-4 py-2 text-sm">
-                                <span>{{ $item->quantidade }}x {{ $item->produto->nome }}</span>
-                                <span>R$ {{ number_format($item->preco_unitario * $item->quantidade, 2, ',', '.') }}</span>
+                            <div class="flex justify-between px-4 py-2.5 text-sm">
+                                <span class="text-gray-700">{{ $item->quantidade }}x {{ $item->produto->nome }}</span>
+                                <span class="font-medium text-gray-900">R$ {{ number_format($item->preco_unitario * $item->quantidade, 2, ',', '.') }}</span>
                             </div>
                         @endforeach
                     </div>
-                    <div class="flex justify-between mt-2 font-semibold text-gray-900">
+                    <div class="flex justify-between mt-3 font-semibold text-gray-900">
                         <span>Total</span>
                         <span>R$ {{ number_format($carrinho->itens->sum(fn ($i) => $i->preco_unitario * $i->quantidade), 2, ',', '.') }}</span>
                     </div>
@@ -74,15 +80,18 @@
 
                 {{-- Endereço --}}
                 <div>
-                    <x-input-label for="endereco_id" value="Endereço de entrega" />
+                    <h3 class="font-display font-semibold text-gray-900 mb-3">
+                        <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-violet-600 text-white text-xs mr-2">3</span>
+                        Endereço de entrega
+                    </h3>
 
                     @if ($enderecos->isEmpty())
-                        <p class="text-sm text-gray-500 mt-2 mb-4">
-                            Você ainda não tem um endereço cadastrado. Cadastre um abaixo para continuar.
+                        <p class="text-sm text-gray-500">
+                            Você ainda não tem um endereço cadastrado. Cadastre um acima para continuar.
                         </p>
                     @else
                         <select id="endereco_id" name="endereco_id" required
-                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                            class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-violet-500 focus:border-violet-500">
                             @foreach ($enderecos as $endereco)
                                 <option value="{{ $endereco->id }}">
                                     {{ $endereco->rua }}, {{ $endereco->numero }} - {{ $endereco->bairro }}, {{ $endereco->cidade }}/{{ $endereco->estado }}
@@ -95,9 +104,12 @@
 
                 {{-- Pagamento --}}
                 <div>
-                    <x-input-label for="metodo_pagamento" value="Método de pagamento" />
+                    <h3 class="font-display font-semibold text-gray-900 mb-3">
+                        <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-violet-600 text-white text-xs mr-2">4</span>
+                        Pagamento
+                    </h3>
                     <select id="metodo_pagamento" name="metodo_pagamento" required
-                        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                        class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-violet-500 focus:border-violet-500">
                         <option value="pix">Pix</option>
                         <option value="cartao">Cartão de crédito</option>
                         <option value="boleto">Boleto</option>
@@ -108,11 +120,11 @@
                 {{-- Cupom --}}
                 <div>
                     <x-input-label for="codigo_cupom" value="Cupom de desconto (opcional)" />
-                    <x-text-input id="codigo_cupom" name="codigo_cupom" class="mt-1 block w-full" />
+                    <x-text-input id="codigo_cupom" name="codigo_cupom" class="mt-1 block w-full" placeholder="Ex: BEMVINDO10" />
                     <x-input-error :messages="$errors->get('codigo_cupom')" class="mt-2" />
                 </div>
 
-                <x-primary-button :disabled="$enderecos->isEmpty()">
+                <x-primary-button class="w-full justify-center py-3" :disabled="$enderecos->isEmpty()">
                     Confirmar pedido
                 </x-primary-button>
             </form>

@@ -1,22 +1,33 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Bem-vindo à loja') }}
-        </h2>
-    </x-slot>
+    <div class="bg-gradient-to-br from-violet-50 via-white to-white border-b border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
+            <p class="text-sm font-semibold uppercase tracking-widest text-violet-600">Bem-vindo à AcmeStore</p>
+            <h1 class="mt-3 font-display text-4xl sm:text-5xl font-semibold text-gray-900 max-w-2xl leading-tight">
+                Tudo o que você precisa, <em class="not-italic text-violet-600">num só lugar</em>.
+            </h1>
+            <p class="mt-4 text-gray-600 max-w-xl">
+                Eletrônicos, moda, casa, esporte e muito mais &mdash; com preços justos e entrega para todo o Brasil.
+            </p>
+            <div class="mt-8 flex flex-wrap gap-3">
+                <a href="{{ route('produtos.index') }}">
+                    <x-primary-button class="px-6 py-3 text-sm">Explorar produtos</x-primary-button>
+                </a>
+            </div>
+        </div>
+    </div>
 
     <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-10">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-12">
 
             {{-- Categorias --}}
             @if ($categorias->isNotEmpty())
-                <section>
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Categorias</h3>
-                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+                <section class="px-4 sm:px-0">
+                    <h3 class="font-display text-xl font-semibold text-gray-900 mb-4">Categorias</h3>
+                    <div class="flex flex-wrap gap-3">
                         @foreach ($categorias as $categoria)
                             <a href="{{ route('produtos.index', ['categoria' => $categoria->slug]) }}"
-                               class="bg-white rounded-lg shadow-sm p-4 text-center hover:shadow-md transition">
-                                <span class="block text-sm font-medium text-gray-700">{{ $categoria->nome }}</span>
+                               class="inline-flex items-center rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:border-violet-300 hover:bg-violet-50 hover:text-violet-700 transition">
+                                {{ $categoria->nome }}
                             </a>
                         @endforeach
                     </div>
@@ -24,43 +35,26 @@
             @endif
 
             {{-- Produtos em destaque --}}
-            <section>
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">Produtos em destaque</h3>
+            <section class="px-4 sm:px-0">
+                <div class="flex items-baseline justify-between mb-4">
+                    <h3 class="font-display text-xl font-semibold text-gray-900">Produtos em destaque</h3>
+                    <a href="{{ route('produtos.index') }}" class="text-sm font-medium text-violet-600 hover:text-violet-800">
+                        Ver todos &rarr;
+                    </a>
+                </div>
 
                 @if ($produtosDestaque->isEmpty())
-                    <div class="bg-white rounded-lg shadow-sm p-6 text-gray-500">
+                    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-10 text-center text-gray-500">
                         Nenhum produto em destaque no momento.
                     </div>
                 @else
-                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5">
                         @foreach ($produtosDestaque as $produto)
-                            <a href="{{ route('produtos.show', $produto) }}"
-                               class="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition flex flex-col">
-                                <div class="aspect-square bg-gray-100 flex items-center justify-center text-gray-400 text-sm">
-                                    @if ($produto->imagens->isNotEmpty())
-                                        <img src="{{ $produto->imagens->first()->url }}" alt="{{ $produto->nome }}" class="w-full h-full object-cover">
-                                    @else
-                                        Sem imagem
-                                    @endif
-                                </div>
-                                <div class="p-4 flex-1 flex flex-col">
-                                    <span class="text-xs text-gray-500">{{ $produto->categoria?->nome }}</span>
-                                    <span class="font-medium text-gray-900 mt-1">{{ $produto->nome }}</span>
-                                    <span class="mt-auto pt-2 font-semibold text-indigo-600">
-                                        R$ {{ number_format($produto->preco_final, 2, ',', '.') }}
-                                    </span>
-                                </div>
-                            </a>
+                            <x-product-card :produto="$produto" />
                         @endforeach
                     </div>
                 @endif
             </section>
-
-            <div>
-                <a href="{{ route('produtos.index') }}" class="text-indigo-600 hover:text-indigo-800 font-medium">
-                    Ver todos os produtos &rarr;
-                </a>
-            </div>
         </div>
     </div>
 </x-app-layout>

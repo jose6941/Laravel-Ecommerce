@@ -2,11 +2,11 @@
 
 namespace App\Policies;
 
-use App\Models\User;
+use App\Models\Usuario;
 
 class ProductPolicy
 {
-    public function viewAny(?User $user): bool { return true; } // catálogo é público
-    public function create(User $user): bool    { return $user->isAdmin(); }
-    public function update(User $user): bool    { return $user->isAdmin(); }
+    public function viewAny(?Usuario $usuario): bool { return true; } // catálogo é público
+    public function create(Usuario $usuario): bool    { return $usuario->isAdmin(); }
+    public function update(Usuario $usuario): bool    { return $usuario->isAdmin(); }
 }

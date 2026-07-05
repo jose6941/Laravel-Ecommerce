@@ -10,7 +10,7 @@ class InicioController extends Controller
 {
     public function index()
     {
-        $produtosDestaque = Produto::ativo()->destaque()->with(['categoria', 'imagens'])->take(8)->get();
+        $produtosDestaque = Produto::ativo()->destaque()->with(['categoria', 'imagemPrincipal'])->take(8)->get();
         $categorias = Categoria::ativo()->nivelRaiz()->take(6)->get();
 
         return view('home', compact('produtosDestaque', 'categorias'));

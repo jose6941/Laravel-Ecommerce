@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Produto;
+use App\Models\Categoria;
 use Illuminate\Support\Facades\Storage;
 
 class ProdutoController extends Controller
@@ -11,7 +12,7 @@ class ProdutoController extends Controller
     public function index(Request $request)
     {
         $produtos = Produto::ativo()
-            ->with(['categoria', 'imagens'])
+            ->with(['categoria', 'imagemPrincipal'])
             ->when($request->filled('categoria'), fn ($q) =>
                 $q->whereHas('categoria', fn ($c) => $c->where('slug', $request->categoria)))
             ->when($request->filled('q'), fn ($q) =>
@@ -19,14 +20,16 @@ class ProdutoController extends Controller
             ->paginate(12)
             ->withQueryString();
 
-        return view('produtos.index', compact('produtos'));
+        $categorias = Categoria::ativo()->nivelRaiz()->orderBy('nome')->get();
+
+        return view('produtos.index', compact('produtos', 'categorias'));
     }
 
     public function show(Produto $produto)
     {
         abort_unless($produto->ativo, 404);
-        $produto->load('imagens', 'categoria', 'avaliacoes');
-        
+        $produto->load('imagens', 'categoria', 'avaliacoesAprovadas.usuario');
+
         return view('produtos.show', compact('produto'));
     }
 

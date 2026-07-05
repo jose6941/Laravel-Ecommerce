@@ -1,47 +1,59 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+        <h2 class="font-display font-semibold text-2xl text-gray-900">
             {{ __('Produtos') }}
         </h2>
     </x-slot>
 
-    <div class="py-12">
+    <div class="py-10">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
-            <form method="GET" action="{{ route('produtos.index') }}" class="mb-6 flex gap-3">
-                <input type="text" name="q" value="{{ request('q') }}" placeholder="Buscar produtos..."
-                    class="flex-1 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-                <x-primary-button type="submit">Buscar</x-primary-button>
-            </form>
+            <div class="px-4 sm:px-0 space-y-5 mb-8">
+                <form method="GET" action="{{ route('produtos.index') }}" class="flex gap-3">
+                    @if (request('categoria'))
+                        <input type="hidden" name="categoria" value="{{ request('categoria') }}">
+                    @endif
+                    <div class="relative flex-1">
+                        <svg class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-4.34-4.34M19 11a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z" />
+                        </svg>
+                        <input type="text" name="q" value="{{ request('q') }}" placeholder="Buscar produtos..."
+                            class="w-full pl-10 border-gray-300 rounded-lg shadow-sm focus:ring-violet-500 focus:border-violet-500">
+                    </div>
+                    <x-primary-button type="submit">Buscar</x-primary-button>
+                </form>
+
+                @if ($categorias->isNotEmpty())
+                    <div class="flex flex-wrap gap-2">
+                        <a href="{{ route('produtos.index', array_filter(['q' => request('q')])) }}"
+                           class="inline-flex items-center rounded-full px-4 py-1.5 text-sm font-medium transition
+                                  {{ request('categoria') ? 'border border-gray-200 bg-white text-gray-600 hover:border-violet-300 hover:text-violet-700' : 'bg-violet-600 text-white' }}">
+                            Todas
+                        </a>
+                        @foreach ($categorias as $categoria)
+                            <a href="{{ route('produtos.index', array_filter(['categoria' => $categoria->slug, 'q' => request('q')])) }}"
+                               class="inline-flex items-center rounded-full px-4 py-1.5 text-sm font-medium transition
+                                      {{ request('categoria') === $categoria->slug ? 'bg-violet-600 text-white' : 'border border-gray-200 bg-white text-gray-600 hover:border-violet-300 hover:text-violet-700' }}">
+                                {{ $categoria->nome }}
+                            </a>
+                        @endforeach
+                    </div>
+                @endif
+            </div>
 
             @if ($produtos->isEmpty())
-                <div class="bg-white rounded-lg shadow-sm p-6 text-gray-500">
-                    Nenhum produto encontrado.
+                <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-10 text-center mx-4 sm:mx-0">
+                    <p class="text-gray-700 font-medium">Nenhum produto encontrado.</p>
+                    <p class="text-gray-500 text-sm mt-1">Tente buscar por outro termo ou remover os filtros aplicados.</p>
                 </div>
             @else
-                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5 px-4 sm:px-0">
                     @foreach ($produtos as $produto)
-                        <a href="{{ route('produtos.show', $produto) }}"
-                           class="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition flex flex-col">
-                            <div class="aspect-square bg-gray-100 flex items-center justify-center text-gray-400 text-sm">
-                                @if ($produto->imagens->isNotEmpty())
-                                    <img src="{{ $produto->imagens->first()->url }}" alt="{{ $produto->nome }}" class="w-full h-full object-cover">
-                                @else
-                                    Sem imagem
-                                @endif
-                            </div>
-                            <div class="p-4 flex-1 flex flex-col">
-                                <span class="text-xs text-gray-500">{{ $produto->categoria?->nome }}</span>
-                                <span class="font-medium text-gray-900 mt-1">{{ $produto->nome }}</span>
-                                <span class="mt-auto pt-2 font-semibold text-indigo-600">
-                                    R$ {{ number_format($produto->preco_final, 2, ',', '.') }}
-                                </span>
-                            </div>
-                        </a>
+                        <x-product-card :produto="$produto" />
                     @endforeach
                 </div>
 
-                <div class="mt-8">
+                <div class="mt-8 px-4 sm:px-0">
                     {{ $produtos->links() }}
                 </div>
             @endif

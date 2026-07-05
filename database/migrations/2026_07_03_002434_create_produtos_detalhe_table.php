@@ -9,7 +9,6 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    // imagens_produto
     public function up(): void
     {
         Schema::create('imagens_produto', function (Blueprint $table) {
@@ -21,7 +20,6 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        // enderecos
         Schema::create('enderecos', function (Blueprint $table) {
             $table->id();
             $table->foreignId('usuario_id')->constrained('usuarios')->cascadeOnDelete();
@@ -37,7 +35,6 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        // cupons
         Schema::create('cupons', function (Blueprint $table) {
             $table->id();
             $table->string('codigo')->unique();

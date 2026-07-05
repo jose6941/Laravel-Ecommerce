@@ -15,19 +15,22 @@ class CategorySeeder extends Seeder
     {
         $categorias = [
             'Eletrônicos',
-            'Moda',
+            'Moda Masculina',
+            'Moda Feminina',
             'Casa e Decoração',
-            'Esportes',
+            'Esportes e Lazer',
             'Livros',
-            'Beleza',
+            'Beleza e Cuidados',
+            'Brinquedos e Jogos',
+            'Pet Shop',
+            'Papelaria e Escritório',
         ];
 
         foreach ($categorias as $nome) {
-            Categoria::create([
-                'nome' => $nome,
-                'slug' => Str::slug($nome),
-                'ativo' => true,
-            ]);
+            Categoria::updateOrCreate(
+                ['slug' => Str::slug($nome)],
+                ['nome' => $nome, 'ativo' => true]
+            );
         }
     }
 }

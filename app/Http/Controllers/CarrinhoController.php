@@ -73,7 +73,7 @@ class CarrinhoController extends Controller
         $usuario = Auth::user();
         $sessao_id = session()->getId();
 
-        $query = Carrinho::with('itens.produto');
+        $query = Carrinho::with('itens.produto.imagemPrincipal');
         
         if ($usuario) {
             $query->where('usuario_id', $usuario->id);
