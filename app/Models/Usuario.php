@@ -12,19 +12,8 @@ class Usuario extends Authenticatable
     use HasFactory, Notifiable;
 
     protected $table = 'usuarios';
-
-    protected $fillable = [
-        'nome',
-        'email',
-        'senha',
-        'perfil',
-        'telefone',
-    ];
-
-    protected $hidden = [
-        'senha',
-        'remember_token',
-    ];
+    protected $fillable = ['nome','email','senha','perfil','telefone',];
+    protected $hidden = ['senha','remember_token',];
 
     protected function casts(): array
     {
@@ -34,9 +23,15 @@ class Usuario extends Authenticatable
         ];
     }
 
-    public function pedidos()    { return $this->hasMany(Pedido::class); }
-    public function avaliacoes() { return $this->hasMany(Avaliacao::class); }
-    public function enderecos()  { return $this->hasMany(Endereco::class); }
+    public function pedidos(){ 
+        return $this->hasMany(Pedido::class); 
+    }
+    public function avaliacoes(){ 
+        return $this->hasMany(Avaliacao::class); 
+    }
+    public function enderecos(){ 
+        return $this->hasMany(Endereco::class); 
+    }
 
     public function getAuthPassword(): string
     {

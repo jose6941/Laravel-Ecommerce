@@ -9,6 +9,7 @@ use App\Http\Controllers\PedidoController;
 use App\Http\Controllers\PainelController;
 use App\Http\Controllers\EnderecoController;
 use App\Http\Controllers\AvaliacaoController;
+use App\Http\Controllers\AdminProdutoController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -45,7 +46,10 @@ Route::middleware('auth')->group(function () {
     Route::patch('/perfil', [PerfilController::class, 'update'])->name('profile.update');
     Route::delete('/perfil', [PerfilController::class, 'destroy'])->name('profile.destroy');
 
-    Route::get('/admin', [PainelController::class, 'index'])->name('admin.dashboard');
+    Route::middleware([\App\Http\Middleware\IsAdmin::class])->prefix('admin')->name('admin.')->group(function () {
+        Route::get('/', [PainelController::class, 'index'])->name('dashboard');
+        Route::resource('produtos', AdminProdutoController::class)->except(['show']);
+    });
 });
 
 require __DIR__.'/auth.php';

@@ -35,7 +35,6 @@ class ProdutoController extends Controller
 
     public function store(Request $request)
     {
-        // Simplificado para Junior: Validação direta no controller
         $dados = $request->validate([
             'categoria_id' => 'required|exists:categorias,id',
             'nome' => 'required|string|max:255',

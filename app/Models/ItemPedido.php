@@ -9,6 +9,10 @@ class ItemPedido extends Model
     protected $table = 'itens_pedido';
     protected $fillable = ['pedido_id', 'produto_id', 'nome_produto', 'preco_unitario', 'quantidade', 'total'];
 
-    public function pedido()  { return $this->belongsTo(Pedido::class); }
-    public function produto() { return $this->belongsTo(Produto::class); }
+    public function pedido(){ 
+        return $this->belongsTo(Pedido::class); 
+    }
+    public function produto(){ 
+        return $this->belongsTo(Produto::class); 
+    }
 }

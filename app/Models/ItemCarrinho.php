@@ -9,6 +9,10 @@ class ItemCarrinho extends Model
     protected $table = 'itens_carrinho';
     protected $fillable = ['carrinho_id', 'produto_id', 'quantidade', 'preco_unitario'];
 
-    public function carrinho() { return $this->belongsTo(Carrinho::class); }
-    public function produto()  { return $this->belongsTo(Produto::class); }
+    public function carrinho(){ 
+        return $this->belongsTo(Carrinho::class); 
+    }
+    public function produto(){ 
+        return $this->belongsTo(Produto::class); 
+    }
 }

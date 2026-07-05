@@ -22,9 +22,18 @@ class Pedido extends Model
         static::creating(fn (Pedido $pedido) => $pedido->uuid ??= (string) Str::uuid());
     }
 
-    public function usuario()  { return $this->belongsTo(Usuario::class); }
-    public function itens()    { return $this->hasMany(ItemPedido::class); }
-    public function cupom()    { return $this->belongsTo(Cupom::class); }
+    public function usuario(){ 
+        return $this->belongsTo(Usuario::class); 
+    }
+    public function itens(){ 
+        return $this->hasMany(ItemPedido::class); 
+    }
+    public function cupom(){ 
+        return $this->belongsTo(Cupom::class); 
+    }
 
-    public function getRouteKeyName(): string { return 'uuid'; }
+    public function getRouteKeyName(): string
+    { 
+        return 'uuid'; 
+    }
 }

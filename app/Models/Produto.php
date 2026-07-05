@@ -33,10 +33,18 @@ class Produto extends Model
         });
     }
 
-    public function categoria() { return $this->belongsTo(Categoria::class); }
-    public function imagens()   { return $this->hasMany(ImagemProduto::class)->orderBy('ordem'); }
-    public function avaliacoes()  { return $this->hasMany(Avaliacao::class); }
-    public function avaliacoesAprovadas() { return $this->avaliacoes()->where('aprovado', true)->latest(); }
+    public function categoria(){ 
+        return $this->belongsTo(Categoria::class); 
+    }
+    public function imagens(){ 
+        return $this->hasMany(ImagemProduto::class)->orderBy('ordem'); 
+    }
+    public function avaliacoes(){ 
+        return $this->hasMany(Avaliacao::class); 
+    }
+    public function avaliacoesAprovadas(){ 
+        return $this->avaliacoes()->where('aprovado', true)->latest(); 
+    }
 
     public function imagemPrincipal()
     {
@@ -45,13 +53,22 @@ class Produto extends Model
             ->orderBy('ordem');
     }
 
-    public function scopeAtivo(Builder $q): Builder   { return $q->where('ativo', true); }
-    public function scopeDestaque(Builder $q): Builder { return $q->where('destaque', true); }
+    public function scopeAtivo(Builder $q): Builder
+    { 
+        return $q->where('ativo', true); 
+    }
+    public function scopeDestaque(Builder $q): Builder
+    { 
+        return $q->where('destaque', true); 
+    }
 
     public function getPrecoFinalAttribute(): float
     {
         return (float) ($this->preco_promocional ?? $this->preco);
     }
 
-    public function getRouteKeyName(): string { return 'slug'; }
+    public function getRouteKeyName(): string
+    { 
+        return 'slug'; 
+    }
 }

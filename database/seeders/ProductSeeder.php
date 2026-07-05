@@ -10,10 +10,7 @@ use Illuminate\Support\Str;
 
 class ProductSeeder extends Seeder
 {
-    /**
-     * Comentários de exemplo usados nas avaliações, agrupados pela nota
-     * dada (1 a 5 estrelas) para soarem coerentes.
-     */
+
     private array $comentariosPorNota = [
         5 => [
             'Superou minhas expectativas, recomendo muito!',
@@ -58,9 +55,7 @@ class ProductSeeder extends Seeder
 
         $clientes = Usuario::where('perfil', 'cliente')->get();
         $catalogo = $this->catalogo();
-
         $skuIndex = 1;
-
         foreach ($catalogo as $nomeCategoria => $produtos) {
             $categoria = Categoria::where('nome', $nomeCategoria)->first();
 
@@ -88,36 +83,26 @@ class ProductSeeder extends Seeder
 
                 $skuIndex++;
 
-                $this->gerarGaleriaDeImagens($produto, $slug);
+                $this->gerarGaleriaDeImagens($produto, $slug, $dados['img'] ?? 'product');
                 $this->gerarAvaliacoes($produto, $clientes);
             }
         }
     }
 
-    /**
-     * Gera uma galeria com 3 imagens de demonstração para o produto,
-     * usando um serviço de placeholder com URL completa e determinística
-     * (mesma semente = mesma imagem em toda nova execução da seeder).
-     */
-    private function gerarGaleriaDeImagens(Produto $produto, string $slug): void
+    private function gerarGaleriaDeImagens(Produto $produto, string $slug, string $palavraChave): void
     {
-        // Remove imagens antigas para a seeder poder ser executada novamente
-        // sem duplicar registros.
         $produto->imagens()->delete();
 
         for ($i = 0; $i < 3; $i++) {
+            $lock = crc32("{$slug}-{$i}");
             $produto->imagens()->create([
-                'caminho' => "https://picsum.photos/seed/{$slug}-{$i}/800/800",
+                'caminho' => "https://loremflickr.com/800/800/{$palavraChave}?lock={$lock}",
                 'principal' => $i === 0,
                 'ordem' => $i,
             ]);
         }
     }
 
-    /**
-     * Gera de 0 a 5 avaliações aprovadas por clientes distintos, com nota
-     * e comentário coerentes entre si.
-     */
     private function gerarAvaliacoes(Produto $produto, $clientes): void
     {
         $produto->avaliacoes()->delete();
@@ -147,10 +132,6 @@ class ProductSeeder extends Seeder
         }
     }
 
-    /**
-     * Sorteia uma nota de 1 a 5 com maior probabilidade para notas altas,
-     * como costuma acontecer em avaliações reais de e-commerce.
-     */
     private function notaAleatoriaPonderada(): int
     {
         $sorteio = rand(1, 100);
@@ -167,81 +148,81 @@ class ProductSeeder extends Seeder
     /**
      * Catálogo de produtos de exemplo, agrupado por categoria.
      *
-     * @return array<string, array<int, array{nome: string, preco: float, promo?: float|null, estoque: int, destaque?: bool, descricao?: string}>>
+     * @return array<string, array<int, array{nome: string, preco: float, promo?: float|null, estoque: int, destaque?: bool, descricao?: string, img: string}>>
      */
     private function catalogo(): array
     {
         return [
             'Eletrônicos' => [
-                ['nome' => 'Fone de Ouvido Bluetooth TWS', 'preco' => 199.90, 'promo' => 149.90, 'estoque' => 40, 'destaque' => true],
-                ['nome' => 'Smartwatch Sport Pro', 'preco' => 349.90, 'estoque' => 25, 'destaque' => true],
-                ['nome' => 'Caixa de Som Portátil à Prova d\'Água', 'preco' => 179.90, 'promo' => 139.90, 'estoque' => 30],
-                ['nome' => 'Carregador Portátil 20000mAh', 'preco' => 99.90, 'estoque' => 60],
-                ['nome' => 'Mouse Gamer RGB', 'preco' => 129.90, 'promo' => 99.90, 'estoque' => 0],
-                ['nome' => 'Teclado Mecânico Compacto', 'preco' => 259.90, 'estoque' => 18],
+                ['nome' => 'Fone de Ouvido Bluetooth TWS', 'preco' => 199.90, 'promo' => 149.90, 'estoque' => 40, 'destaque' => true, 'img' => 'headphones'],
+                ['nome' => 'Smartwatch Sport Pro', 'preco' => 349.90, 'estoque' => 25, 'destaque' => true, 'img' => 'smartwatch'],
+                ['nome' => 'Caixa de Som Portátil à Prova d\'Água', 'preco' => 179.90, 'promo' => 139.90, 'estoque' => 30, 'img' => 'speaker'],
+                ['nome' => 'Carregador Portátil 20000mAh', 'preco' => 99.90, 'estoque' => 60, 'img' => 'powerbank'],
+                ['nome' => 'Mouse Gamer RGB', 'preco' => 129.90, 'promo' => 99.90, 'estoque' => 0, 'img' => 'mouse'],
+                ['nome' => 'Teclado Mecânico Compacto', 'preco' => 259.90, 'estoque' => 18, 'img' => 'keyboard'],
             ],
             'Moda Masculina' => [
-                ['nome' => 'Camiseta Básica Algodão', 'preco' => 59.90, 'estoque' => 80, 'destaque' => true],
-                ['nome' => 'Calça Jeans Slim', 'preco' => 149.90, 'promo' => 119.90, 'estoque' => 45],
-                ['nome' => 'Jaqueta Corta-Vento', 'preco' => 189.90, 'estoque' => 20],
-                ['nome' => 'Tênis Casual em Couro', 'preco' => 229.90, 'promo' => 189.90, 'estoque' => 15, 'destaque' => true],
-                ['nome' => 'Bermuda em Tactel', 'preco' => 79.90, 'estoque' => 50],
+                ['nome' => 'Camiseta Básica Algodão', 'preco' => 59.90, 'estoque' => 80, 'destaque' => true, 'img' => 'tshirt'],
+                ['nome' => 'Calça Jeans Slim', 'preco' => 149.90, 'promo' => 119.90, 'estoque' => 45, 'img' => 'jeans'],
+                ['nome' => 'Jaqueta Corta-Vento', 'preco' => 189.90, 'estoque' => 20, 'img' => 'jacket'],
+                ['nome' => 'Tênis Casual em Couro', 'preco' => 229.90, 'promo' => 189.90, 'estoque' => 15, 'destaque' => true, 'img' => 'shoes'],
+                ['nome' => 'Bermuda em Tactel', 'preco' => 79.90, 'estoque' => 50, 'img' => 'shorts'],
             ],
             'Moda Feminina' => [
-                ['nome' => 'Vestido Midi Floral', 'preco' => 139.90, 'estoque' => 35, 'destaque' => true],
-                ['nome' => 'Blusa de Tricô', 'preco' => 89.90, 'promo' => 69.90, 'estoque' => 40],
-                ['nome' => 'Legging Fitness', 'preco' => 69.90, 'estoque' => 55],
-                ['nome' => 'Bolsa Transversal Couro Sintético', 'preco' => 159.90, 'promo' => 129.90, 'estoque' => 22],
-                ['nome' => 'Sandália Rasteira', 'preco' => 99.90, 'estoque' => 0],
+                ['nome' => 'Vestido Midi Floral', 'preco' => 139.90, 'estoque' => 35, 'destaque' => true, 'img' => 'dress'],
+                ['nome' => 'Blusa de Tricô', 'preco' => 89.90, 'promo' => 69.90, 'estoque' => 40, 'img' => 'sweater'],
+                ['nome' => 'Legging Fitness', 'preco' => 69.90, 'estoque' => 55, 'img' => 'leggings'],
+                ['nome' => 'Bolsa Transversal Couro Sintético', 'preco' => 159.90, 'promo' => 129.90, 'estoque' => 22, 'img' => 'handbag'],
+                ['nome' => 'Sandália Rasteira', 'preco' => 99.90, 'estoque' => 0, 'img' => 'sandals'],
             ],
             'Casa e Decoração' => [
-                ['nome' => 'Luminária de Mesa LED', 'preco' => 89.90, 'estoque' => 30],
-                ['nome' => 'Jogo de Panelas Antiaderente 5 Peças', 'preco' => 249.90, 'promo' => 199.90, 'estoque' => 20, 'destaque' => true],
-                ['nome' => 'Kit Organizadores de Gaveta', 'preco' => 49.90, 'estoque' => 70],
-                ['nome' => 'Difusor de Aromas Elétrico', 'preco' => 79.90, 'promo' => 59.90, 'estoque' => 35],
-                ['nome' => 'Manta de Sofá Soft', 'preco' => 99.90, 'estoque' => 28],
+                ['nome' => 'Luminária de Mesa LED', 'preco' => 89.90, 'estoque' => 30, 'img' => 'lamp'],
+                ['nome' => 'Jogo de Panelas Antiaderente 5 Peças', 'preco' => 249.90, 'promo' => 199.90, 'estoque' => 20, 'destaque' => true, 'img' => 'cookware'],
+                ['nome' => 'Kit Organizadores de Gaveta', 'preco' => 49.90, 'estoque' => 70, 'img' => 'organizer'],
+                ['nome' => 'Difusor de Aromas Elétrico', 'preco' => 79.90, 'promo' => 59.90, 'estoque' => 35, 'img' => 'diffuser'],
+                ['nome' => 'Manta de Sofá Soft', 'preco' => 99.90, 'estoque' => 28, 'img' => 'blanket'],
             ],
             'Esportes e Lazer' => [
-                ['nome' => 'Bola de Futebol Oficial', 'preco' => 129.90, 'estoque' => 40],
-                ['nome' => 'Kit Halteres Emborrachados 10kg', 'preco' => 199.90, 'promo' => 169.90, 'estoque' => 15, 'destaque' => true],
-                ['nome' => 'Bicicleta Aro 29', 'preco' => 1299.90, 'promo' => 1099.90, 'estoque' => 8, 'destaque' => true],
-                ['nome' => 'Corda de Pular Profissional', 'preco' => 39.90, 'estoque' => 90],
-                ['nome' => 'Tapete de Yoga Antiderrapante', 'preco' => 89.90, 'estoque' => 33],
+                ['nome' => 'Bola de Futebol Oficial', 'preco' => 129.90, 'estoque' => 40, 'img' => 'soccer'],
+                ['nome' => 'Kit Halteres Emborrachados 10kg', 'preco' => 199.90, 'promo' => 169.90, 'estoque' => 15, 'destaque' => true, 'img' => 'dumbbells'],
+                ['nome' => 'Bicicleta Aro 29', 'preco' => 1299.90, 'promo' => 1099.90, 'estoque' => 8, 'destaque' => true, 'img' => 'bicycle'],
+                ['nome' => 'Corda de Pular Profissional', 'preco' => 39.90, 'estoque' => 90, 'img' => 'rope'],
+                ['nome' => 'Tapete de Yoga Antiderrapante', 'preco' => 89.90, 'estoque' => 33, 'img' => 'yoga'],
             ],
             'Livros' => [
-                ['nome' => 'Livro: Introdução à Programação', 'preco' => 79.90, 'estoque' => 25, 'destaque' => true],
-                ['nome' => 'Livro: O Poder do Hábito', 'preco' => 49.90, 'promo' => 39.90, 'estoque' => 60],
-                ['nome' => 'Livro: Uma Breve História da Humanidade', 'preco' => 59.90, 'estoque' => 45],
-                ['nome' => 'Livro: Contos de Fadas Ilustrado', 'preco' => 44.90, 'estoque' => 38],
-                ['nome' => 'Livro: Atlas Geográfico Escolar', 'preco' => 69.90, 'estoque' => 0],
+                ['nome' => 'Livro: Introdução à Programação', 'preco' => 79.90, 'estoque' => 25, 'destaque' => true, 'img' => 'book'],
+                ['nome' => 'Livro: O Poder do Hábito', 'preco' => 49.90, 'promo' => 39.90, 'estoque' => 60, 'img' => 'book'],
+                ['nome' => 'Livro: Uma Breve História da Humanidade', 'preco' => 59.90, 'estoque' => 45, 'img' => 'book'],
+                ['nome' => 'Livro: Contos de Fadas Ilustrado', 'preco' => 44.90, 'estoque' => 38, 'img' => 'book'],
+                ['nome' => 'Livro: Atlas Geográfico Escolar', 'preco' => 69.90, 'estoque' => 0, 'img' => 'atlas'],
             ],
             'Beleza e Cuidados' => [
-                ['nome' => 'Kit Skincare Facial Completo', 'preco' => 159.90, 'promo' => 129.90, 'estoque' => 30, 'destaque' => true],
-                ['nome' => 'Perfume Importado 100ml', 'preco' => 249.90, 'estoque' => 20],
-                ['nome' => 'Secador de Cabelo Profissional', 'preco' => 189.90, 'promo' => 159.90, 'estoque' => 18],
-                ['nome' => 'Escova Alisadora Térmica', 'preco' => 129.90, 'estoque' => 25],
-                ['nome' => 'Kit Maquiagem Completo', 'preco' => 179.90, 'estoque' => 22],
+                ['nome' => 'Kit Skincare Facial Completo', 'preco' => 159.90, 'promo' => 129.90, 'estoque' => 30, 'destaque' => true, 'img' => 'skincare'],
+                ['nome' => 'Perfume Importado 100ml', 'preco' => 249.90, 'estoque' => 20, 'img' => 'perfume'],
+                ['nome' => 'Secador de Cabelo Profissional', 'preco' => 189.90, 'promo' => 159.90, 'estoque' => 18, 'img' => 'hairdryer'],
+                ['nome' => 'Escova Alisadora Térmica', 'preco' => 129.90, 'estoque' => 25, 'img' => 'hairstyle'],
+                ['nome' => 'Kit Maquiagem Completo', 'preco' => 179.90, 'estoque' => 22, 'img' => 'makeup'],
             ],
             'Brinquedos e Jogos' => [
-                ['nome' => 'Quebra-Cabeça 1000 Peças', 'preco' => 69.90, 'estoque' => 40],
-                ['nome' => 'Jogo de Tabuleiro Estratégia', 'preco' => 99.90, 'promo' => 79.90, 'estoque' => 25, 'destaque' => true],
-                ['nome' => 'Carrinho de Controle Remoto', 'preco' => 149.90, 'estoque' => 20],
-                ['nome' => 'Boneca com Acessórios', 'preco' => 89.90, 'estoque' => 35],
-                ['nome' => 'Pelúcia Urso Gigante', 'preco' => 119.90, 'promo' => 99.90, 'estoque' => 15],
+                ['nome' => 'Quebra-Cabeça 1000 Peças', 'preco' => 69.90, 'estoque' => 40, 'img' => 'puzzle'],
+                ['nome' => 'Jogo de Tabuleiro Estratégia', 'preco' => 99.90, 'promo' => 79.90, 'estoque' => 25, 'destaque' => true, 'img' => 'boardgame'],
+                ['nome' => 'Carrinho de Controle Remoto', 'preco' => 149.90, 'estoque' => 20, 'img' => 'toycar'],
+                ['nome' => 'Boneca com Acessórios', 'preco' => 89.90, 'estoque' => 35, 'img' => 'doll'],
+                ['nome' => 'Pelúcia Urso Gigante', 'preco' => 119.90, 'promo' => 99.90, 'estoque' => 15, 'img' => 'teddybear'],
             ],
             'Pet Shop' => [
-                ['nome' => 'Ração Premium para Cães 15kg', 'preco' => 189.90, 'estoque' => 50],
-                ['nome' => 'Arranhador para Gatos', 'preco' => 99.90, 'estoque' => 24],
-                ['nome' => 'Cama Pet Confort', 'preco' => 129.90, 'promo' => 99.90, 'estoque' => 20, 'destaque' => true],
-                ['nome' => 'Coleira Ajustável com Guia', 'preco' => 49.90, 'estoque' => 60],
-                ['nome' => 'Brinquedo Mordedor Resistente', 'preco' => 29.90, 'estoque' => 0],
+                ['nome' => 'Ração Premium para Cães 15kg', 'preco' => 189.90, 'estoque' => 50, 'img' => 'dogfood'],
+                ['nome' => 'Arranhador para Gatos', 'preco' => 99.90, 'estoque' => 24, 'img' => 'cat'],
+                ['nome' => 'Cama Pet Confort', 'preco' => 129.90, 'promo' => 99.90, 'estoque' => 20, 'destaque' => true, 'img' => 'petbed'],
+                ['nome' => 'Coleira Ajustável com Guia', 'preco' => 49.90, 'estoque' => 60, 'img' => 'dogcollar'],
+                ['nome' => 'Brinquedo Mordedor Resistente', 'preco' => 29.90, 'estoque' => 0, 'img' => 'dogtoy'],
             ],
             'Papelaria e Escritório' => [
-                ['nome' => 'Mochila para Notebook', 'preco' => 149.90, 'estoque' => 30, 'destaque' => true],
-                ['nome' => 'Caderno Inteligente A5', 'preco' => 79.90, 'promo' => 59.90, 'estoque' => 45],
-                ['nome' => 'Kit Canetas Coloridas 24 Cores', 'preco' => 39.90, 'estoque' => 70],
-                ['nome' => 'Organizador de Mesa em Bambu', 'preco' => 89.90, 'estoque' => 25],
-                ['nome' => 'Cadeira de Escritório Ergonômica', 'preco' => 599.90, 'promo' => 499.90, 'estoque' => 10, 'destaque' => true],
+                ['nome' => 'Mochila para Notebook', 'preco' => 149.90, 'estoque' => 30, 'destaque' => true, 'img' => 'backpack'],
+                ['nome' => 'Caderno Inteligente A5', 'preco' => 79.90, 'promo' => 59.90, 'estoque' => 45, 'img' => 'notebook'],
+                ['nome' => 'Kit Canetas Coloridas 24 Cores', 'preco' => 39.90, 'estoque' => 70, 'img' => 'pens'],
+                ['nome' => 'Organizador de Mesa em Bambu', 'preco' => 89.90, 'estoque' => 25, 'img' => 'desk'],
+                ['nome' => 'Cadeira de Escritório Ergonômica', 'preco' => 599.90, 'promo' => 499.90, 'estoque' => 10, 'destaque' => true, 'img' => 'officechair'],
             ],
         ];
     }
