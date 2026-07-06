@@ -2,7 +2,7 @@
      :class="scrolled ? 'shadow-md border-b border-transparent bg-white/95 backdrop-blur-md' : 'shadow-none border-b border-gray-100 bg-white'"
      class="sticky top-0 z-40 text-dark transition-all duration-300">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between items-center h-24">
+        <div class="flex justify-between items-center h-[5.5rem]">
             
             <!-- Logo -->
             <div class="flex-shrink-0 flex items-center">
@@ -14,33 +14,30 @@
             <!-- Centered Links (Desktop) -->
             <div class="hidden md:flex items-center justify-center flex-1 space-x-10">
                 <a href="{{ route('home') }}" class="nav-link relative text-xs font-bold tracking-[0.15em] uppercase pb-1 transition {{ request()->routeIs('home') ? 'text-[#1a1a1a] nav-link-active' : 'text-gray-500 hover:text-[#1a1a1a]' }}">Home</a>
-                <a href="{{ route('produtos.index') }}" class="nav-link relative text-xs font-bold tracking-[0.15em] uppercase pb-1 transition {{ request()->routeIs('produtos.*') ? 'text-[#1a1a1a] nav-link-active' : 'text-gray-500 hover:text-[#1a1a1a]' }}">Todos os Produtos</a>
+                <a href="{{ route('produtos.index') }}" class="nav-link relative text-xs font-bold tracking-[0.15em] uppercase pb-1 transition {{ request()->routeIs('produtos.*') ? 'text-[#1a1a1a] nav-link-active' : 'text-gray-500 hover:text-[#1a1a1a]' }}">Produtos</a>
                 @auth
                     <a href="{{ route('dashboard') }}" class="nav-link relative text-xs font-bold tracking-[0.15em] uppercase pb-1 transition {{ request()->routeIs('dashboard') || request()->routeIs('admin.dashboard') ? 'text-[#1a1a1a] nav-link-active' : 'text-gray-500 hover:text-[#1a1a1a]' }}">Painel</a>
                 @endauth
             </div>
 
             <!-- Actions (Right) -->
-            <div class="flex items-center gap-6">
-                <!-- Search Form -->
-                <form action="{{ route('produtos.index') }}" method="GET" class="flex items-center border-b border-gray-300 focus-within:border-[#1a1a1a] pb-1 transition-colors">
-                    <input type="text" name="q" placeholder="Buscar..." class="text-sm bg-transparent border-none px-2 py-1 text-dark placeholder-gray-400 focus:outline-none focus:ring-0 w-28 md:w-40 transition-all" value="{{ request('q') }}">
-                    <button type="submit" class="text-dark hover:text-gray-500 transition focus:outline-none">
-                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                        </svg>
-                    </button>
-                </form>
-
-                <!-- Cart -->
-                <a href="{{ route('carrinho.index') }}" class="bg-[#1a1a1a] text-white hover:bg-gray-700 transition-all duration-300 px-6 py-2.5 text-xs font-bold tracking-[0.15em] uppercase rounded-full flex items-center gap-2 shadow-sm hover:shadow-md">
-                    CARRINHO ({{ $quantidadeCarrinho ?? 0 }})
+            <div class="flex items-center gap-5">
+                <!-- Cart Icon with Badge -->
+                <a href="{{ route('carrinho.index') }}" class="relative flex items-center justify-center w-11 h-11 rounded-full border-2 border-[#1a1a1a]/20 hover:bg-gray-100 hover:border-[#1a1a1a]/50 transition-all duration-300 group">
+                    <svg class="w-5 h-5 text-[#1a1a1a]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                    </svg>
+                    @if(($quantidadeCarrinho ?? 0) > 0)
+                        <span class="absolute -top-1.5 -right-1.5 bg-[#1a1a1a] text-white text-[9px] font-bold w-[18px] h-[18px] rounded-full flex items-center justify-center shadow-sm">
+                            {{ min($quantidadeCarrinho, 99) }}
+                        </span>
+                    @endif
                 </a>
 
                 <!-- User Profile / Login -->
                 @auth
                     <div x-data="{ dropdownOpen: false }" class="relative">
-                        <button @click="dropdownOpen = !dropdownOpen" class="flex items-center justify-center h-9 w-9 rounded-full border border-[#1a1a1a]/20 text-dark hover:bg-gray-100 transition focus:outline-none">
+                        <button @click="dropdownOpen = !dropdownOpen" class="flex items-center justify-center h-10 w-10 rounded-full border-2 border-[#1a1a1a]/20 text-dark hover:bg-gray-100 hover:border-[#1a1a1a]/50 transition-all duration-300 focus:outline-none">
                             <span class="text-xs font-bold">{{ substr(Auth::user()->name, 0, 1) }}</span>
                         </button>
 
@@ -56,7 +53,7 @@
                         </div>
                     </div>
                 @else
-                    <a href="{{ route('login') }}" class="hidden md:inline-flex items-center justify-center px-5 py-2 text-xs font-bold tracking-[0.15em] uppercase text-[#1a1a1a] hover:bg-[#1a1a1a] hover:text-white transition-all duration-300 border-2 border-[#1a1a1a] rounded-full">
+                    <a href="{{ route('login') }}" class="hidden md:inline-flex items-center justify-center px-5 py-2.5 text-xs font-bold tracking-[0.15em] uppercase text-[#1a1a1a] hover:bg-[#1a1a1a] hover:text-white hover:shadow-lg transition-all duration-300 border-2 border-[#1a1a1a] rounded-full">
                         LOGIN
                     </a>
                 @endauth
@@ -96,7 +93,7 @@
     <div x-show="open" class="md:hidden border-t border-gray-100 bg-white" style="display: none;">
         <div class="pt-2 pb-4 space-y-1 px-4">
             <a href="{{ route('home') }}" class="block px-2 py-3 text-base font-medium {{ request()->routeIs('home') ? 'text-dark' : 'text-gray-500' }} border-b border-gray-50">Home</a>
-            <a href="{{ route('produtos.index') }}" class="block px-2 py-3 text-base font-medium {{ request()->routeIs('produtos.*') ? 'text-dark' : 'text-gray-500' }} border-b border-gray-50">Todos os Produtos</a>
+            <a href="{{ route('produtos.index') }}" class="block px-2 py-3 text-base font-medium {{ request()->routeIs('produtos.*') ? 'text-dark' : 'text-gray-500' }} border-b border-gray-50">Produtos</a>
             @auth
                 <a href="{{ route('dashboard') }}" class="block px-2 py-3 text-base font-medium text-gray-500 border-b border-gray-50">Painel do Usuário</a>
             @endauth
