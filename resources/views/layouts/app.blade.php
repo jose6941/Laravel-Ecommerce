@@ -9,7 +9,7 @@
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700,800|poppins:500,600,700&display=swap" rel="stylesheet" />
+        <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700,800|outfit:400,500,600,700,800,900&display=swap" rel="stylesheet" />
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -17,6 +17,8 @@
         <!-- Alpine Plugins -->
         <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/intersect@3.x.x/dist/cdn.min.js"></script>
         <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+        <!-- GSAP is loaded via npm in resources/js/app.js -->
         
         <style>
             .no-scrollbar::-webkit-scrollbar {
@@ -28,19 +30,8 @@
             }
         </style>
     </head>
-    <body class="font-sans text-gray-900 antialiased bg-[#f8f9fa] selection:bg-black selection:text-white">
+    <body class="font-sans text-dark antialiased bg-white selection:bg-primary selection:text-dark" style="zoom: 0.8;">
         
-        <!-- Top Banner / Notice -->
-        <div class="bg-black text-white text-xs text-center py-2 px-4 sm:flex sm:justify-between sm:items-center">
-            <div class="max-w-7xl mx-auto w-full flex justify-between items-center">
-                <span class="hidden sm:inline">Summer Sale For All Swim Suits And Free Express Delivery - OFF 50%! <a href="#" class="font-bold underline ml-1">Shop Now</a></span>
-                <span class="sm:hidden text-center w-full">Summer Sale - 50% OFF!</span>
-                <div class="hidden sm:flex items-center gap-4">
-                    <a href="#" class="hover:text-gray-300">English</a>
-                </div>
-            </div>
-        </div>
-
         <div class="min-h-screen flex flex-col">
             
             <!-- Top Navigation -->
@@ -75,33 +66,50 @@
             </main>
             
             <!-- Simple Footer -->
-            <footer class="bg-black text-white py-12 mt-auto">
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-8">
-                    <div>
-                        <h3 class="text-xl font-bold mb-4">ClickMart</h3>
-                        <p class="text-gray-400 text-sm">A melhor loja para suas compras online.</p>
+            <footer class="bg-dark text-white py-16 mt-auto">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="grid grid-cols-1 md:grid-cols-5 gap-8 border-b border-gray-800 pb-12 mb-8">
+                        <div class="md:col-span-2">
+                            <h3 class="text-3xl font-display font-bold mb-4 tracking-tight">Heepzy<br><span class="text-primary text-xl">S N E A K E R S</span></h3>
+                            <p class="text-gray-400 text-sm mb-6 max-w-xs">Built for every move, every mood. Experience the ultimate comfort and style.</p>
+                            <div class="flex gap-4">
+                                <a href="#" class="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center hover:bg-primary hover:text-dark transition">F</a>
+                                <a href="#" class="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center hover:bg-primary hover:text-dark transition">T</a>
+                                <a href="#" class="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center hover:bg-primary hover:text-dark transition">I</a>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-sm tracking-wider uppercase text-gray-500 mb-4">Shop</h4>
+                            <ul class="space-y-3 text-sm text-gray-300">
+                                <li><a href="#" class="hover:text-primary transition">All Sneakers</a></li>
+                                <li><a href="#" class="hover:text-primary transition">Best Sellers</a></li>
+                                <li><a href="#" class="hover:text-primary transition">New Arrivals</a></li>
+                                <li><a href="#" class="hover:text-primary transition">Collections</a></li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-sm tracking-wider uppercase text-gray-500 mb-4">Company</h4>
+                            <ul class="space-y-3 text-sm text-gray-300">
+                                <li><a href="#" class="hover:text-primary transition">Our Story</a></li>
+                                <li><a href="#" class="hover:text-primary transition">Careers</a></li>
+                                <li><a href="#" class="hover:text-primary transition">Sustainability</a></li>
+                                <li><a href="#" class="hover:text-primary transition">Press</a></li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-sm tracking-wider uppercase text-gray-500 mb-4">Newsletter</h4>
+                            <p class="text-xs text-gray-400 mb-4">Get updates on new drops & offers.</p>
+                            <form class="flex border border-gray-700 rounded overflow-hidden focus-within:border-primary transition">
+                                <input type="email" placeholder="Enter your email" class="bg-transparent border-none text-sm px-4 py-2 w-full focus:ring-0 text-white placeholder-gray-500">
+                                <button type="submit" class="px-4 text-primary hover:text-white transition">→</button>
+                            </form>
+                        </div>
                     </div>
-                    <div>
-                        <h4 class="font-semibold mb-4">Suporte</h4>
-                        <ul class="space-y-2 text-sm text-gray-400">
-                            <li><a href="#" class="hover:text-white">Central de Ajuda</a></li>
-                            <li><a href="#" class="hover:text-white">Opções de Entrega</a></li>
-                            <li><a href="#" class="hover:text-white">Devoluções</a></li>
-                        </ul>
-                    </div>
-                    <div>
-                        <h4 class="font-semibold mb-4">Conta</h4>
-                        <ul class="space-y-2 text-sm text-gray-400">
-                            <li><a href="{{ route('profile.edit') }}" class="hover:text-white">Minha Conta</a></li>
-                            <li><a href="{{ route('carrinho.index') }}" class="hover:text-white">Carrinho</a></li>
-                            <li><a href="{{ route('produtos.index') }}" class="hover:text-white">Lista de Desejos</a></li>
-                        </ul>
-                    </div>
-                    <div>
-                        <h4 class="font-semibold mb-4">Baixe o App</h4>
-                        <div class="flex gap-2">
-                            <div class="w-32 h-10 bg-gray-800 rounded flex items-center justify-center text-xs border border-gray-700">App Store</div>
-                            <div class="w-32 h-10 bg-gray-800 rounded flex items-center justify-center text-xs border border-gray-700">Google Play</div>
+                    <div class="flex flex-col md:flex-row justify-between items-center text-xs text-gray-500">
+                        <p>&copy; 2024 Heepzy Sneakers. All rights reserved.</p>
+                        <div class="flex gap-4 mt-4 md:mt-0">
+                            <a href="#" class="hover:text-white transition">Privacy Policy</a>
+                            <a href="#" class="hover:text-white transition">Terms of Service</a>
                         </div>
                     </div>
                 </div>

@@ -12,8 +12,14 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['Figtree', ...defaultTheme.fontFamily.sans],
+                sans: ['Inter', ...defaultTheme.fontFamily.sans],
+                display: ['Outfit', 'Inter', ...defaultTheme.fontFamily.sans],
             },
+            colors: {
+                primary: '#e2e8f0', // Silver/slate tone
+                dark: '#0A0A0A',
+                light: '#F8F9FA',
+            }
         },
     },
 

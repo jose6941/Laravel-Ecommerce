@@ -14,7 +14,7 @@
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans text-gray-900 antialiased bg-gray-50">
+    <body class="font-sans text-gray-900 antialiased bg-gray-50" style="zoom: 0.8;">
         <div class="min-h-screen max-w-md mx-auto sm:max-w-xl bg-white flex flex-col pt-12 sm:pt-20 px-8 relative overflow-hidden shadow-xl sm:shadow-none sm:border sm:border-gray-100 sm:my-10 sm:rounded-3xl sm:min-h-[80vh]">
             
             <!-- Back button (mock) -->

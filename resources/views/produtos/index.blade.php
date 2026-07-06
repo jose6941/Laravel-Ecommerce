@@ -5,7 +5,7 @@
         </h2>
     </x-slot>
 
-    <div class="py-10">
+    <div class="py-10 bg-white">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
             <div class="px-4 sm:px-0 space-y-5 mb-8">
@@ -18,22 +18,22 @@
                             <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-4.34-4.34M19 11a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z" />
                         </svg>
                         <input type="text" name="q" value="{{ request('q') }}" placeholder="Buscar produtos..."
-                            class="w-full pl-10 border-gray-300 rounded-lg shadow-sm focus:ring-violet-500 focus:border-violet-500">
+                            class="w-full pl-10 border-gray-300 rounded-none shadow-sm focus:ring-0 focus:border-dark transition">
                     </div>
-                    <x-primary-button type="submit">Buscar</x-primary-button>
+                    <button type="submit" class="bg-dark text-white rounded-none px-6 text-xs font-bold tracking-widest uppercase hover:bg-gray-800 transition">BUSCAR</button>
                 </form>
 
                 @if ($categorias->isNotEmpty())
-                    <div class="flex flex-wrap gap-2">
+                    <div class="flex flex-wrap gap-3">
                         <a href="{{ route('produtos.index', array_filter(['q' => request('q')])) }}"
-                           class="inline-flex items-center rounded-full px-4 py-1.5 text-sm font-medium transition
-                                  {{ request('categoria') ? 'border border-gray-200 bg-white text-gray-600 hover:border-violet-300 hover:text-violet-700' : 'bg-violet-600 text-white' }}">
+                           class="inline-flex items-center rounded-full px-5 py-2.5 text-xs font-bold tracking-widest uppercase transition-all duration-300 border
+                                  {{ request('categoria') ? 'bg-white text-dark border-gray-200 hover:bg-primary hover:text-white hover:border-primary hover:scale-105 hover:shadow-lg' : 'bg-dark text-white border-dark scale-105 shadow-lg' }}">
                             Todas
                         </a>
                         @foreach ($categorias as $categoria)
                             <a href="{{ route('produtos.index', array_filter(['categoria' => $categoria->slug, 'q' => request('q')])) }}"
-                               class="inline-flex items-center rounded-full px-4 py-1.5 text-sm font-medium transition
-                                      {{ request('categoria') === $categoria->slug ? 'bg-violet-600 text-white' : 'border border-gray-200 bg-white text-gray-600 hover:border-violet-300 hover:text-violet-700' }}">
+                               class="inline-flex items-center rounded-full px-5 py-2.5 text-xs font-bold tracking-widest uppercase transition-all duration-300 border
+                                      {{ request('categoria') === $categoria->slug ? 'bg-dark text-white border-dark scale-105 shadow-lg' : 'bg-white text-dark border-gray-200 hover:bg-primary hover:text-white hover:border-primary hover:scale-105 hover:shadow-lg' }}">
                                 {{ $categoria->nome }}
                             </a>
                         @endforeach
@@ -47,10 +47,14 @@
                     <p class="text-gray-500 text-sm mt-1">Tente buscar por outro termo ou remover os filtros aplicados.</p>
                 </div>
             @else
-                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5 px-4 sm:px-0">
-                    @foreach ($produtos as $produto)
-                        <x-product-card :produto="$produto" />
-                    @endforeach
+                <div class="bg-gray-50 rounded-2xl p-4 sm:p-8 mx-4 sm:mx-0">
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5 gsap-products-grid">
+                        @foreach ($produtos as $produto)
+                            <div class="gsap-product-card">
+                                <x-product-card :produto="$produto" />
+                            </div>
+                        @endforeach
+                    </div>
                 </div>
 
                 <div class="mt-8 px-4 sm:px-0">
@@ -59,4 +63,28 @@
             @endif
         </div>
     </div>
+
+    <!-- GSAP Stagger Animation for Product Grid -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof gsap !== 'undefined') {
+                const productsGrid = document.querySelector('.gsap-products-grid');
+                if (productsGrid && typeof ScrollTrigger !== 'undefined') {
+                    gsap.from('.gsap-product-card', {
+                        scrollTrigger: {
+                            trigger: productsGrid,
+                            start: 'top 85%',
+                            toggleActions: 'play none none reverse'
+                        },
+                        y: 60,
+                        opacity: 0,
+                        scale: 0.95,
+                        duration: 0.7,
+                        stagger: 0.1,
+                        ease: 'power3.out'
+                    });
+                }
+            }
+        });
+    </script>
 </x-app-layout>
