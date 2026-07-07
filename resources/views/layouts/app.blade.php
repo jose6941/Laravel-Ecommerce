@@ -61,7 +61,7 @@
             @endif
 
             <!-- Page Content -->
-            <main class="flex-grow pb-12 w-full">
+            <main class="flex-grow w-full">
                 {{ $slot }}
             </main>
             

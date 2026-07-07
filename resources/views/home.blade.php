@@ -14,7 +14,7 @@
             <div class="relative flex flex-col lg:flex-row items-center">
 
                 <!-- Left Side - Text Content -->
-                <div class="w-full lg:w-[40%] pl-4 pr-4 sm:pl-10 sm:pr-8 lg:pl-14 lg:pr-4 py-16 lg:py-24 z-20">
+                <div class="w-full lg:w-[38%] pl-4 pr-4 sm:pl-12 sm:pr-10 lg:pl-20 lg:pr-6 py-16 lg:py-24 z-20">
                     <!-- Tagline superior -->
                     <div class="gsap-banner-item mb-5">
                         <span class="inline-flex items-center gap-2 text-xs font-bold text-[#1a1a1a] tracking-[0.25em] uppercase">
@@ -26,18 +26,18 @@
                     <!-- Título principal -->
                     <h1 class="gsap-banner-item font-display font-black leading-[0.85] tracking-tighter text-[#1a1a1a] mb-5">
                         <span class="text-[3.5rem] sm:text-[4.5rem] lg:text-[5.5rem] xl:text-[7rem]">CONFORTO</span><br>
-                        <span class="text-[2.6rem] sm:text-[3.4rem] lg:text-[4.2rem] xl:text-[5rem] text-gray-400" style="text-shadow: 0 0 45px rgba(113,113,122,0.35);">REIMAGINADO</span>
+                        <span class="text-[2.6rem] sm:text-[3.4rem] lg:text-[4.2rem] xl:text-[5rem] text-[#4a4a4a]" style="text-shadow: 0 0 30px rgba(74,74,74,0.2);">REIMAGINADO</span>
                     </h1>
 
                     <!-- Subtítulo -->
-                    <p class="gsap-banner-item text-gray-500 text-sm sm:text-base font-light leading-relaxed max-w-md mb-8">
+                    <p class="gsap-banner-item text-gray-600 text-sm sm:text-base font-normal leading-relaxed max-w-md mb-8">
                         Tecnologia de amortecimento dinâmico. Leveza absoluta.<br>
                         Design que vira cabeças. Feito para quem não passa despercebido.
                     </p>
 
                     <!-- CTA - Apenas o botão de comprar agora -->
                     <div class="gsap-banner-item flex flex-wrap items-center gap-3">
-                        <a href="{{ route('produtos.index') }}"
+                        <a href="{{ route('home') }}"
                            class="inline-flex items-center gap-2.5 bg-[#1a1a1a] text-white px-10 py-[18px] text-sm font-bold tracking-[0.15em] uppercase rounded-full hover:bg-gray-800 transition-all duration-300 shadow-lg hover:shadow-xl">
                             COMPRAR AGORA
                             <svg class="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
@@ -62,7 +62,7 @@
                 </div>
 
                 <!-- Right Side - Tênis preto (foto real recortada, fundo transparente, sem cortes) -->
-                <div class="w-full lg:w-[60%] flex items-center justify-center lg:justify-end pl-6 pr-4 lg:pr-8 lg:pl-4 z-20">
+                <div class="w-full lg:w-[62%] flex items-center justify-center lg:justify-end pl-6 pr-4 lg:pr-4 lg:pl-8 z-20">
                     <div class="gsap-sneaker-wrapper relative w-full max-w-lg lg:max-w-xl">
                         <img src="/images/sneaker-photo-final.png"
                              alt="Tênis Preto Heepzy"
@@ -83,48 +83,32 @@
         </div>
     </div>
 
+    <!-- Gradiente de transição do banner para categorias -->
+    <div class="h-4 lg:h-6 bg-gradient-to-b from-[#f0f0ee] to-gray-50"></div>
+
     <!-- Categorias Section -->
-    <div class="relative py-16 lg:py-20 bg-[#f0f0ee]">
-        <!-- Linha divisória sutil no topo (transição do banner) -->
-        <div class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gray-300/40 to-transparent"></div>
+    <div class="relative py-12 lg:py-16 bg-gray-50">
 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <!-- Cabeçalho editorial -->
             <div class="text-center mb-10 lg:mb-12 gsap-fade-up">
                 <div class="flex items-center justify-center gap-4 mb-4">
                     <span class="w-8 h-[2px] bg-gray-400"></span>
-                    <span class="text-[10px] font-bold text-[#1a1a1a] tracking-[0.3em] uppercase font-display">Categorias</span>
+                    <span class="text-xs font-bold text-[#1a1a1a] tracking-[0.3em] uppercase font-display">Categorias</span>
                     <span class="w-8 h-[2px] bg-gray-400"></span>
                 </div>
-                <h2 class="font-display font-black text-[#1a1a1a] text-3xl md:text-4xl lg:text-5xl leading-[0.9] tracking-tighter">
+                <h2 class="font-display font-black text-[#1a1a1a] text-4xl md:text-5xl lg:text-6xl leading-[0.9] tracking-tighter">
                     ENCONTRE<br class="sm:hidden"> O SEU ESTILO
                 </h2>
             </div>
 
             @if($categorias->isNotEmpty())
-                @php
-                    $iconMap = [
-                        'eletronicos' => '<svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3" /></svg>',
-                        'moda-masculina' => '<svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 3.75H6.912a2.25 2.25 0 00-2.15 1.588L2.35 13.177a2.25 2.25 0 00-.1.661V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18v-4.162c0-.224-.034-.447-.1-.661l-2.412-7.839a2.25 2.25 0 00-2.15-1.588H15M2.25 13.5h3.86a2.25 2.25 0 012.012 1.244l.256.512a2.25 2.25 0 002.013 1.244h3.218a2.25 2.25 0 002.013-1.244l.256-.512a2.25 2.25 0 012.013-1.244h3.859" /></svg>',
-                        'moda-feminina' => '<svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>',
-                        'casa-e-decoracao' => '<svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955a1.126 1.126 0 011.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" /></svg>',
-                        'esportes-e-lazer' => '<svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM6.75 21H18M4.5 21v-3.75A3.75 3.75 0 018.25 13.5h7.5a3.75 3.75 0 013.75 3.75V21" /></svg>',
-                        'livros' => '<svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /></svg>',
-                        'beleza-e-cuidados' => '<svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" /></svg>',
-                        'brinquedos-e-jogos' => '<svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14.25 6.087c0-.355.186-.676.401-.959.221-.29.349-.634.349-1.003 0-1.036-1.007-1.875-2.25-1.875s-2.25.84-2.25 1.875c0 .369.128.713.349 1.003.215.283.401.604.401.959v0a.64.64 0 01-.657.643 48.39 48.39 0 01-4.163-.3c.186 1.613.293 3.25.315 4.907a.656.656 0 01-.658.663v0c-.355 0-.676-.186-.959-.401a1.647 1.647 0 00-1.003-.349c-1.036 0-1.875 1.007-1.875 2.25s.84 2.25 1.875 2.25c.369 0 .713-.128 1.003-.349.283-.215.604-.401.959-.401v0c.31 0 .555.26.532.57a48.039 48.039 0 01-.642 5.056c1.518.19 3.058.309 4.616.354a.64.64 0 00.657-.643v0c0-.355-.186-.676-.401-.959a1.647 1.647 0 01-.349-1.003c0-1.035 1.008-1.875 2.25-1.875 1.243 0 2.25.84 2.25 1.875 0 .369-.128.713-.349 1.003-.215.283-.401.604-.401.959v0c0 .333.277.599.61.58a48.1 48.1 0 005.427-.63 48.05 48.05 0 00.582-4.717.532.532 0 00-.533-.57v0c-.355 0-.676.186-.959.401-.29.221-.634.349-1.003.349-1.035 0-1.875-1.007-1.875-2.25s.84-2.25 1.875-2.25c.37 0 .713.128 1.003.349.283.215.604.401.959.401v0a.656.656 0 00.658-.663 48.422 48.422 0 00-.37-5.36c-1.886.342-3.81.574-5.766.689a.578.578 0 01-.61-.58v0z" /></svg>',
-                        'pet-shop' => '<svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6.633 10.5c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 012.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 00.322-1.672V3a.75.75 0 01.75-.75A2.25 2.25 0 0116.5 4.5c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 01-2.649 7.521c-.388.482-.987.729-1.605.729H14.23c-.483 0-.964-.078-1.423-.23l-3.114-1.04a4.501 4.501 0 00-1.423-.23H5.904M14.25 9h2.25M5.904 18.75c.083.205.173.405.27.602.197.4-.078.898-.523.898h-.908c-.889 0-1.713-.518-1.972-1.368a12 12 0 01-.521-3.507c0-1.553.295-3.036.831-4.398C3.387 10.203 4.167 9.75 5 9.75h1.053c.472 0 .745.556.5.96a8.958 8.958 0 00-1.302 4.665c0 1.194.232 2.333.654 3.375z" /></svg>',
-                        'papelaria-e-escritorio' => '<svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" /></svg>',
-                    ];
-                @endphp
-                <div class="flex flex-wrap justify-center gap-3">
+                <div class="flex flex-wrap justify-center gap-2.5 gsap-category-grid">
                     @foreach($categorias as $categoria)
-                        <a href="{{ route('produtos.index', ['categoria' => $categoria->slug]) }}"
-                           class="gsap-category-chip group inline-flex items-center gap-2.5 px-6 py-3 bg-[#1a1a1a] text-white border-2 border-[#1a1a1a] rounded-full text-sm font-display font-bold tracking-wider hover:bg-white hover:text-[#1a1a1a] hover:scale-105 hover:shadow-xl transition-all duration-500 ease-out shadow-lg">
-                            @if(isset($iconMap[$categoria->slug]))
-                                {!! $iconMap[$categoria->slug] !!}
-                            @endif
+                        <a href="{{ route('home', ['categoria' => $categoria->slug]) }}"
+                           class="gsap-category-chip group inline-flex items-center gap-2.5 px-6 py-3 bg-black/80 border-2 border-black/80 text-white rounded-full text-sm font-bold tracking-wider hover:bg-white hover:text-dark hover:scale-105 hover:shadow-lg transition-all duration-400 ease-out shadow-md whitespace-nowrap">
                             <span>{{ $categoria->nome }}</span>
-                            <span class="inline-block transition-transform duration-500 ease-out group-hover:translate-x-1 opacity-60">&rarr;</span>
+                            <span class="inline-block transition-transform duration-400 ease-out group-hover:translate-x-1 opacity-60">&rarr;</span>
                         </a>
                     @endforeach
                 </div>
@@ -160,81 +144,155 @@
         </div>
     </div>
 
-
-
-    <!-- Best Sellers -->
-    <div class="py-20 lg:py-24 bg-gray-200">
+    <!-- Seção Nova Coleção (texto + busca, sem categorias) -->
+    <div class="py-10 lg:py-12 bg-gray-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="mb-12 lg:mb-14 gsap-fade-up">
-                <div class="flex items-center gap-3 mb-3">
-                    <span class="w-6 h-[2px] bg-gray-400"></span>
-                    <span class="text-[10px] font-bold text-[#1a1a1a] tracking-[0.25em] uppercase font-display">Destaques</span>
+            <div class="gsap-fade-up">
+                <div class="flex items-center gap-3 mb-4">
+                    <span class="w-8 h-[2px] bg-gray-400"></span>
+                    <span class="text-xs font-bold text-[#1a1a1a] tracking-[0.25em] uppercase font-display">Destaques</span>
                 </div>
-                <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display font-black text-dark leading-[0.9] uppercase tracking-tighter mb-6">NOVA COLEÇÃO<br class="sm:hidden"> PARA O SEU RITMO</h2>
-                
-                <div class="flex flex-col items-start gap-4">
-                    <p class="text-gray-500 text-sm font-medium leading-relaxed max-w-lg">Tecnológicos para corrida, treinos e cidade. Escolha seu par e siga em frente.</p>
-                    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full sm:w-auto">
-                        <form action="{{ route('produtos.index') }}" method="GET" class="flex items-center bg-white border border-gray-300 focus-within:border-[#1a1a1a] focus-within:shadow-sm rounded-full overflow-hidden transition-all duration-300 w-full sm:w-auto">
-                            <input type="text" name="q" placeholder="Buscar produtos..." class="text-sm bg-transparent border-none px-4 py-2.5 text-dark placeholder-gray-400 focus:outline-none focus:ring-0 w-full sm:w-48 md:w-56 transition-all">
-                            <button type="submit" class="px-3.5 text-gray-400 hover:text-[#1a1a1a] transition-colors duration-300 shrink-0">
-                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-                            </button>
-                        </form>
-                        <a href="{{ route('produtos.index') }}" class="inline-flex items-center gap-2 bg-dark text-white px-6 py-2.5 text-xs font-bold tracking-widest uppercase rounded-full hover:bg-gray-800 transition-all duration-300 hover:shadow-lg shrink-0">
-                            TODOS OS MODELOS
-                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
-                        </a>
-                    </div>
-                </div>
+                <h2 class="text-4xl sm:text-5xl lg:text-6xl font-display font-black text-dark leading-[0.9] uppercase tracking-tighter mb-6">NOVA COLEÇÃO<br class="sm:hidden"> PARA O SEU RITMO</h2>
             </div>
 
-            @if(isset($produtosDestaque) && $produtosDestaque->isNotEmpty())
-                <div class="grid grid-cols-2 md:grid-cols-3 gap-5 sm:gap-6 lg:gap-7 gsap-products-grid">
-                    @foreach ($produtosDestaque->take(9) as $index => $produto)
+            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-8 gsap-fade-up">
+                <form method="GET" action="{{ route('home') }}" class="flex items-center bg-white border border-gray-300 focus-within:border-[#1a1a1a] focus-within:shadow-sm rounded-full overflow-hidden transition-all duration-300 w-full sm:w-auto">
+                    @if (request('categoria'))
+                        <input type="hidden" name="categoria" value="{{ request('categoria') }}">
+                    @endif
+                    <input type="text" name="q" value="{{ request('q') }}" placeholder="Buscar produtos..."
+                           class="text-base bg-transparent border-none px-6 py-3.5 text-dark placeholder-gray-400 focus:outline-none focus:ring-0 w-full sm:w-64 md:w-80 transition-all">
+                    <button type="submit" class="px-4 text-gray-400 hover:text-[#1a1a1a] transition-colors duration-300 shrink-0">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                    </button>
+                </form>
+                <a href="{{ route('home') }}" class="inline-flex items-center gap-2 bg-dark text-white px-8 py-3.5 text-base font-bold tracking-widest uppercase rounded-full hover:bg-gray-800 transition-all duration-300 hover:shadow-lg shrink-0">
+                    TODOS OS MODELOS
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gradiente de transição -->
+    <div class="h-4 lg:h-6 bg-gradient-to-b from-gray-50 to-gray-200"></div>
+
+    <!-- Produtos - Grid Completo com Paginação -->
+    <div class="pb-12 lg:pb-16 bg-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            @if ($produtos->isEmpty())
+                <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-10 text-center">
+                    <p class="text-gray-700 font-medium">Nenhum produto encontrado.</p>
+                    <p class="text-gray-500 text-sm mt-1">Tente buscar por outro termo ou remover os filtros aplicados.</p>
+                </div>
+            @else
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 gsap-products-grid">
+                    @foreach ($produtos as $produto)
                         <div class="gsap-product-card">
                             <x-product-card :produto="$produto" />
                         </div>
                     @endforeach
                 </div>
-            @else
-                <div class="text-center py-12 text-gray-500">Nenhum produto encontrado.</div>
+
+                <div class="mt-8">
+                    {{ $produtos->links() }}
+                </div>
             @endif
         </div>
     </div>
 
-    <!-- Dark Banner 1 -->
-    <div class="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="bg-dark rounded-3xl p-12 lg:p-20 relative overflow-hidden flex flex-col md:flex-row items-center justify-between gsap-fade-up">
-            <div class="relative z-10 md:w-1/2">
-                <span class="text-xs font-bold text-gray-400 tracking-widest uppercase mb-4 block">/ Why Heepzy?</span>
-                <h2 class="text-4xl lg:text-5xl font-display font-bold text-white leading-tight mb-8">Designed For Comfort.<br>Built To Last.</h2>
-                <a href="#" class="inline-flex items-center gap-2 bg-primary text-dark px-8 py-3 rounded-full font-bold hover:bg-white transition">
-                    Learn More &rarr;
-                </a>
-                
-                <div class="flex gap-8 mt-12 text-white">
-                    <div class="flex items-center gap-3">
-                        <svg class="w-8 h-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                        <span class="font-medium text-sm">Premium<br>Quality</span>
+    <!-- Banner Relógio - Full-width, premium, sem cortes, sem opacidade -->
+    <div class="w-full bg-[#1a1a1a] relative overflow-hidden flex items-center justify-center gsap-relogio-wrapper" id="relogio-banner" style="min-height: 95vh;">
+        <img src="/images/relogio_banner.png"
+             alt="Relógio Heepzy"
+             class="gsap-relogio-img w-full h-full absolute inset-0 object-contain select-none"
+             draggable="false"
+             style="filter: brightness(1.04) contrast(1.03);">
+        <!-- Overlay gradiente sutil nas bordas para suavizar a transição com o fundo escuro -->
+        <div class="absolute inset-0 pointer-events-none" style="background: radial-gradient(ellipse at center, transparent 60%, rgba(26,26,26,0.5) 100%);"></div>
+    </div>
+
+    <!-- Banner Fone Section - Fundo branco, fone à esquerda, texto à direita -->
+    <div class="w-full bg-white relative overflow-hidden flex items-center" id="airpod-banner" style="min-height: 55vh;">
+
+        <!-- Tipografia gigante de fundo -->
+        <div class="absolute inset-0 flex items-center justify-start pointer-events-none select-none z-0 overflow-hidden">
+            <span class="gsap-fone-bg-text font-display font-black text-[12rem] lg:text-[18rem] leading-none text-gray-200/50 tracking-tighter -ml-4 lg:-ml-10 whitespace-nowrap">SOUND</span>
+        </div>
+
+        <!-- Partículas sutis -->
+        <div id="airpod-particles" class="absolute inset-0 pointer-events-none z-10"></div>
+
+        <div class="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-20">
+            <div class="relative flex flex-col lg:flex-row items-center">
+
+                <!-- Left Side - Fone de ouvido - Imersivo -->
+                <div class="w-full lg:w-[58%] flex items-center justify-center lg:justify-center py-8 lg:py-14 overflow-visible pl-4 sm:pl-8 lg:pl-16 relative">
+                    <!-- Círculo de brilho pulsante atrás do fone -->
+                    <div class="gsap-fone-glow absolute left-[30%] top-1/2 -translate-y-1/2 w-[50%] aspect-square rounded-full bg-gradient-to-r from-gray-100 via-gray-50 to-white opacity-15 blur-3xl pointer-events-none"></div>
+                    <img src="/images/fone-hd.png"
+                         alt="Fone Heepzy Audio"
+                         class="gsap-airpod-img w-full h-auto object-contain select-none relative max-h-[55vh]"
+                         draggable="false"
+                         style="filter: contrast(1.05) brightness(1.02);">
+                </div>
+
+                <!-- Right Side - Text Content (bem distribuído como primeiro banner) -->
+                <div class="w-full lg:w-[42%] pl-4 pr-4 sm:pl-10 sm:pr-10 lg:pl-8 lg:pr-16 py-14 lg:py-20 z-20 text-center lg:text-left">
+                    <!-- Tagline superior -->
+                    <div class="gsap-airpod-item mb-5 flex lg:justify-start justify-center">
+                        <span class="inline-flex items-center gap-2 text-xs font-bold text-gray-500 tracking-[0.25em] uppercase">
+                            <span class="w-6 h-[2px] bg-gray-300"></span>
+                            Heepzy Audio
+                        </span>
                     </div>
-                    <div class="flex items-center gap-3">
-                        <svg class="w-8 h-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" /></svg>
-                        <span class="font-medium text-sm">Breathable<br>Comfort</span>
+
+                    <!-- Título principal -->
+                    <h1 class="gsap-airpod-item font-display font-black leading-[0.85] tracking-tighter text-[#1a1a1a] mb-5">
+                        <span class="text-[3.2rem] sm:text-[4rem] lg:text-[5rem] xl:text-[5.5rem]">SOM</span><br>
+                        <span class="text-[2.4rem] sm:text-[3.2rem] lg:text-[3.8rem] xl:text-[4.2rem] text-gray-400">SEM LIMITES</span>
+                    </h1>
+
+                    <!-- Subtítulo -->
+                    <p class="gsap-airpod-item text-gray-500 text-sm sm:text-base font-normal leading-relaxed max-w-md mb-8">
+                        Áudio espacial com cancelamento de ruído ativo.<br>
+                        30 horas de bateria. Conecte-se ao que realmente importa.
+                    </p>
+
+                    <!-- CTA -->
+                    <div class="gsap-airpod-item flex flex-wrap items-center gap-3 lg:justify-start justify-center">
+                        <a href="{{ route('home', ['categoria' => 'eletronicos']) }}"
+                           class="inline-flex items-center gap-2.5 bg-[#1a1a1a] text-white px-10 py-[18px] text-sm font-bold tracking-[0.15em] uppercase rounded-full hover:bg-gray-800 transition-all duration-300 shadow-lg hover:shadow-xl">
+                            COMPRAR AGORA
+                            <svg class="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                        </a>
+                        <span class="text-xs text-gray-400 font-medium flex items-center gap-1.5">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            A partir de R$ 499,90
+                        </span>
                     </div>
-                    <div class="flex items-center gap-3">
-                        <svg class="w-8 h-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" /><path stroke-linecap="round" stroke-linejoin="round" d="M3.512 15H9v5.488A9.025 9.025 0 013.512 15z" /></svg>
-                        <span class="font-medium text-sm">Lightweight<br>Build</span>
+
+                    <!-- Trust Indicators -->
+                    <div class="gsap-airpod-item flex items-center gap-6 mt-8 pt-6 border-t border-gray-100 lg:justify-start justify-center">
+                        <div class="flex items-center gap-2">
+                            <svg class="w-3.5 h-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                            <span class="text-xs font-medium text-gray-500">1 ano de garantia</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <svg class="w-3.5 h-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" /></svg>
+                            <span class="text-xs font-medium text-gray-500">Entrega expressa</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <svg class="w-3.5 h-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                            <span class="text-xs font-medium text-gray-500">Troca grátis</span>
+                        </div>
                     </div>
                 </div>
             </div>
-            
-            <div class="absolute right-0 top-0 bottom-0 w-1/2 hidden md:block">
-                <!-- Shoe image cut off on the right -->
-                <div class="w-full h-full bg-gray-800 rounded-r-3xl opacity-50 flex items-center justify-center text-white">Dark Sneaker Mockup</div>
-            </div>
         </div>
     </div>
+
+<!-- SWAP_MARKER_RELOGIO -->
 
     <!-- GSAP Initialization -->
     <script>
@@ -288,6 +346,32 @@
                 ease: 'sine.inOut',
                 delay: 2.6
             });
+
+            // ===== BANNER PRINCIPAL — PARALLAX AO SCROLL (como o relógio) =====
+            const bannerSection = document.getElementById('banner-section');
+            if (bannerSection) {
+                // Background text "MADE" + sneaker image — parallax suave com scrub
+                const bannerParallaxTl = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: bannerSection,
+                        start: 'top bottom',
+                        end: 'bottom top',
+                        scrub: 1.5
+                    }
+                });
+
+                // Background text "MADE" se move mais devagar (mais distante)
+                bannerParallaxTl.to('.gsap-bg-text', {
+                    yPercent: -18,
+                    ease: 'none'
+                }, 0);
+
+                // Sneaker — parallax sutil na direção oposta (cria profundidade)
+                bannerParallaxTl.to('.gsap-sneaker-img', {
+                    yPercent: 8,
+                    ease: 'none'
+                }, 0);
+            }
 
             // ===== PARTÍCULAS FLUTUANTES =====
             function createParticles() {
@@ -351,9 +435,143 @@
                 animateParticles(particles);
             }, 600);
 
+            // ===== FONE BANNER ANIMATIONS =====
+
+            const foneTl = gsap.timeline({ defaults: { ease: 'expo.out' } });
+
+            // 0. Background text "SOUND" fade + scale
+            foneTl.from('.gsap-fone-bg-text', {
+                opacity: 0,
+                scale: 1.1,
+                duration: 2.5,
+                ease: 'power2.out'
+            });
+
+            // 1. Texto entra com stagger mais longo e suave
+            foneTl.from('.gsap-airpod-item', {
+                y: 70,
+                opacity: 0,
+                duration: 1.4,
+                stagger: 0.25,
+                ease: 'power4.out'
+            }, '-=1.8');
+
+            // 2. Imagem do fone entra com efeito mais dramático
+            foneTl.from('.gsap-airpod-img', {
+                x: 150,
+                scale: 0.7,
+                rotationZ: 12,
+                opacity: 0,
+                filter: 'blur(30px)',
+                duration: 2.2,
+                ease: 'expo.out'
+            }, '-=2.0');
+
+            // 3. Scroll indicator
+            foneTl.from('.gsap-airpod-scroll', {
+                opacity: 0,
+                y: 15,
+                duration: 1.0
+            }, '-=0.5');
+
+            // 4. Floating contínuo do fone — mais amplitude e rotação
+            gsap.to('.gsap-airpod-img', {
+                y: '-=20',
+                rotationZ: '+=3',
+                scale: 1.02,
+                duration: 5.5,
+                yoyo: true,
+                repeat: -1,
+                ease: 'sine.inOut',
+                delay: 3.0
+            });
+
+            // 5. Pulsar sutil do brilho de fundo
+            gsap.to('.gsap-fone-glow', {
+                scale: 1.12,
+                opacity: 0.3,
+                duration: 3.0,
+                yoyo: true,
+                repeat: -1,
+                ease: 'sine.inOut',
+                delay: 3.5
+            });
+
+            // ===== BANNER FONE — PARALLAX AO SCROLL (como os outros banners) =====
+            const foneBanner = document.getElementById('airpod-banner');
+            if (foneBanner) {
+                const foneParallaxTl = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: foneBanner,
+                        start: 'top bottom',
+                        end: 'bottom top',
+                        scrub: 1.5
+                    }
+                });
+
+                // Background text "SOUND" se move para cima (mais distante)
+                foneParallaxTl.to('.gsap-fone-bg-text', {
+                    yPercent: -15,
+                    ease: 'none'
+                }, 0);
+
+                // Imagem do fone — parallax sutil na direção oposta (profundidade)
+                foneParallaxTl.to('.gsap-airpod-img', {
+                    yPercent: 8,
+                    ease: 'none'
+                }, 0);
+            }
+
+            // ===== PARTÍCULAS DO BANNER FONE =====
+            (function createFoneParticles() {
+                const container = document.getElementById('airpod-particles');
+                if (!container) return;
+
+                const colors = ['#d1d5db', '#9ca3af', '#e5e7eb', '#f3f4f6', '#000000', '#6b7280'];
+                const particleCount = 14;
+
+                container.innerHTML = '';
+
+                for (let i = 0; i < particleCount; i++) {
+                    const particle = document.createElement('div');
+                    const size = gsap.utils.random(2, 6, 0.5);
+                    const isCircle = Math.random() > 0.3;
+
+                    particle.className = 'absolute';
+                    particle.style.cssText = `
+                        width: ${size}px;
+                        height: ${isCircle ? size : size * 0.4}px;
+                        border-radius: ${isCircle ? '50%' : '2px'};
+                        background: ${gsap.utils.random(colors)};
+                        opacity: ${gsap.utils.random(0.04, 0.15, 0.01)};
+                        left: ${gsap.utils.random(2, 98, 0.1)}%;
+                        top: ${gsap.utils.random(2, 98, 0.1)}%;
+                        will-change: transform, opacity;
+                    `;
+
+                    container.appendChild(particle);
+
+                    const maxX = Math.min(window.innerWidth * 0.1, 100);
+                    const maxY = Math.min(window.innerHeight * 0.06, 60);
+
+                    gsap.to(particle, {
+                        x: gsap.utils.random(-maxX, maxX, 1),
+                        y: gsap.utils.random(-maxY, maxY, 1),
+                        rotation: gsap.utils.random(-20, 20, 1),
+                        opacity: gsap.utils.random(0.02, 0.2, 0.01),
+                        duration: gsap.utils.random(12, 25, 0.1),
+                        delay: gsap.utils.random(0, 5, 0.1),
+                        ease: 'sine.inOut',
+                        yoyo: true,
+                        repeat: -1,
+                        repeatDelay: gsap.utils.random(0.5, 3, 0.1)
+                    });
+                }
+            })();
+
             // ===== SCROLL ANIMATIONS =====
             if (typeof ScrollTrigger !== 'undefined') {
-                // Fade-up sections
+                // Fade-up sections — movimento suave (sempre visíveis)
                 const fadeUpElements = document.querySelectorAll('.gsap-fade-up');
                 fadeUpElements.forEach(el => {
                     gsap.from(el, {
@@ -362,43 +580,58 @@
                             start: 'top 85%',
                             toggleActions: 'play none none none'
                         },
-                        y: 50,
-                        opacity: 0,
-                        duration: 0.9,
+                        y: 40,
+                        duration: 1.0,
                         ease: 'power3.out'
                     });
                 });
 
-                // Category chips stagger (apenas movimento sutil, sem opacity)
+                // Category chips stagger — apenas movimento, sem opacity (sempre visíveis)
                 const categoryChips = document.querySelectorAll('.gsap-category-chip');
-                if (categoryChips.length) {
+                const categoryGrid = document.querySelector('.gsap-category-grid');
+                if (categoryChips.length && categoryGrid) {
                     gsap.from(categoryChips, {
                         scrollTrigger: {
-                            trigger: categoryChips[0].parentElement,
+                            trigger: categoryGrid,
                             start: 'top 88%',
                             toggleActions: 'play none none none'
                         },
                         y: 15,
-                        duration: 0.5,
+                        duration: 0.6,
                         stagger: 0.05,
                         ease: 'power2.out'
                     });
                 }
 
-                // Product cards stagger
+                // Relógio banner — parallax suave (sem fade-in, sem opacidade, imagem sempre nítida)
+                const relogioWrapper = document.querySelector('.gsap-relogio-wrapper');
+                if (relogioWrapper) {
+                    gsap.timeline({
+                        scrollTrigger: {
+                            trigger: relogioWrapper,
+                            start: 'top bottom',
+                            end: 'bottom top',
+                            scrub: 1.5
+                        }
+                    })
+                    .to('.gsap-relogio-img', { yPercent: 18, ease: 'none' }, 0)
+                    .to('.gsap-relogio-img', { scale: 1.02, ease: 'none' }, 0);
+                }
+
+                // Product cards stagger — mais perceptível
                 const productsGrid = document.querySelector('.gsap-products-grid');
                 if (productsGrid) {
                     gsap.from('.gsap-product-card', {
                         scrollTrigger: {
                             trigger: productsGrid,
-                            start: 'top 85%',
+                            start: 'top 83%',
                             toggleActions: 'play none none none'
                         },
-                        y: 60,
+                        y: 80,
                         opacity: 0,
-                        scale: 0.95,
-                        duration: 0.8,
-                        stagger: 0.1,
+                        scale: 0.92,
+                        duration: 1.1,
+                        stagger: 0.12,
                         ease: 'power3.out'
                     });
                 }

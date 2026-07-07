@@ -11,13 +11,11 @@
                 </a>
             </div>
 
-            <!-- Centered Links (Desktop) -->
+            <!-- Centered Links (Desktop) - sempre 3 links -->
             <div class="hidden md:flex items-center justify-center flex-1 space-x-10">
-                <a href="{{ route('home') }}" class="nav-link relative text-xs font-bold tracking-[0.15em] uppercase pb-1 transition {{ request()->routeIs('home') ? 'text-[#1a1a1a] nav-link-active' : 'text-gray-500 hover:text-[#1a1a1a]' }}">Home</a>
-                <a href="{{ route('produtos.index') }}" class="nav-link relative text-xs font-bold tracking-[0.15em] uppercase pb-1 transition {{ request()->routeIs('produtos.*') ? 'text-[#1a1a1a] nav-link-active' : 'text-gray-500 hover:text-[#1a1a1a]' }}">Produtos</a>
-                @auth
-                    <a href="{{ route('dashboard') }}" class="nav-link relative text-xs font-bold tracking-[0.15em] uppercase pb-1 transition {{ request()->routeIs('dashboard') || request()->routeIs('admin.dashboard') ? 'text-[#1a1a1a] nav-link-active' : 'text-gray-500 hover:text-[#1a1a1a]' }}">Painel</a>
-                @endauth
+                <a href="{{ route('home') }}" class="nav-link relative text-sm font-bold tracking-[0.15em] uppercase pb-1 transition {{ request()->routeIs('home') ? 'text-[#1a1a1a] nav-link-active' : 'text-gray-500 hover:text-[#1a1a1a]' }}">Home</a>
+                <a href="{{ route('produtos.index') }}" class="nav-link relative text-sm font-bold tracking-[0.15em] uppercase pb-1 transition {{ request()->routeIs('produtos.*') ? 'text-[#1a1a1a] nav-link-active' : 'text-gray-500 hover:text-[#1a1a1a]' }}">Produtos</a>
+                <a href="{{ route('profile.edit') }}" class="nav-link relative text-sm font-bold tracking-[0.15em] uppercase pb-1 transition {{ request()->routeIs('profile.*') ? 'text-[#1a1a1a] nav-link-active' : 'text-gray-500 hover:text-[#1a1a1a]' }}">Perfil</a>
             </div>
 
             <!-- Actions (Right) -->
@@ -53,9 +51,14 @@
                         </div>
                     </div>
                 @else
-                    <a href="{{ route('login') }}" class="hidden md:inline-flex items-center justify-center px-5 py-2.5 text-xs font-bold tracking-[0.15em] uppercase text-[#1a1a1a] hover:bg-[#1a1a1a] hover:text-white hover:shadow-lg transition-all duration-300 border-2 border-[#1a1a1a] rounded-full">
-                        LOGIN
-                    </a>
+                    <div class="hidden md:flex items-center gap-2">
+                        <a href="{{ route('register') }}" class="inline-flex items-center justify-center px-5 py-2.5 text-xs font-bold tracking-[0.15em] uppercase text-white bg-[#1a1a1a] hover:bg-gray-800 hover:shadow-lg transition-all duration-300 rounded-full">
+                            CADASTRO
+                        </a>
+                        <a href="{{ route('login') }}" class="inline-flex items-center justify-center px-5 py-2.5 text-xs font-bold tracking-[0.15em] uppercase text-[#1a1a1a] hover:bg-[#1a1a1a] hover:text-white hover:shadow-lg transition-all duration-300 border-2 border-[#1a1a1a] rounded-full">
+                            LOGIN
+                        </a>
+                    </div>
                 @endauth
 
                 <!-- Mobile menu button -->
