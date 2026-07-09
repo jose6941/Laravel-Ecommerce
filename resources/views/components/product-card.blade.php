@@ -1,7 +1,7 @@
 @props(['produto'])
 
 <a href="{{ route('produtos.show', $produto) }}"
-   class="group flex flex-col w-full bg-white rounded-xl transition-all duration-300 shadow-lg hover:shadow-2xl hover:-translate-y-1 relative overflow-hidden border border-gray-200/60">
+   class="group flex flex-col w-full bg-white rounded-xl transition-all duration-300 shadow-lg hover:shadow-2xl hover:-translate-y-1 relative overflow-hidden border border-gray-200">
     
     <!-- Badge NOVIDADE -->
     <div class="absolute top-3 left-3 z-10 bg-white/90 backdrop-blur-sm text-[8px] font-bold px-2.5 py-1 tracking-[0.15em] uppercase text-dark shadow-sm rounded-full">

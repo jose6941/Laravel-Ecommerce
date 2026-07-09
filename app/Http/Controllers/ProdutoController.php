@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Produto;
 use App\Models\Categoria;
-use Illuminate\Support\Facades\Storage;
 
 class ProdutoController extends Controller
 {
@@ -27,7 +26,10 @@ class ProdutoController extends Controller
 
     public function show(Produto $produto)
     {
-        abort_unless($produto->ativo, 404);
+        if (! $produto->ativo) {
+            abort(404);
+        }
+
         $produto->load('imagens', 'categoria', 'avaliacoesAprovadas.usuario');
 
         return view('produtos.show', compact('produto'));

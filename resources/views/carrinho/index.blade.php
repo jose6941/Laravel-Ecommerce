@@ -1,8 +1,8 @@
 <x-app-layout>
-    <div class="bg-gray-50 min-h-screen pb-24">
+    <div class="pb-24">
         
         <!-- Top Header -->
-        <div class="px-6 py-4 flex items-center justify-between sticky top-0 bg-gray-50/90 backdrop-blur z-20">
+        <div class="px-6 py-4 flex items-center justify-between sticky top-0 bg-[#f0f0ee]/90 backdrop-blur z-20">
             <a href="{{ route('home') }}" class="h-10 w-10 rounded-full bg-white border border-gray-100 flex items-center justify-center shadow-sm text-gray-600 hover:bg-gray-50">
                 <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
@@ -36,7 +36,7 @@
             @else
                 <div class="space-y-4">
                     @foreach ($carrinho->itens as $item)
-                        <div class="bg-white rounded-3xl p-4 flex gap-4 shadow-sm border border-gray-100 items-center relative group">
+                        <div class="bg-white rounded-3xl p-4 flex gap-4 shadow-sm border border-gray-200 items-center relative group">
                             <!-- Image -->
                             <div class="h-24 w-24 shrink-0 rounded-2xl bg-[#F5F5F5] overflow-hidden">
                                 @if ($item->produto?->imagemPrincipal)

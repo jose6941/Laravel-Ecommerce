@@ -83,32 +83,40 @@
         </div>
     </div>
 
-    <!-- Gradiente de transição do banner para categorias -->
-    <div class="h-4 lg:h-6 bg-gradient-to-b from-[#f0f0ee] to-gray-50"></div>
-
     <!-- Categorias Section -->
-    <div class="relative py-12 lg:py-16 bg-gray-50">
+    <div class="relative py-16 lg:py-20 overflow-hidden">
+        <!-- Elemento decorativo de fundo: círculo sutil para dar profundidade -->
+        <div class="absolute -top-40 -right-40 w-80 h-80 rounded-full bg-black/[0.02] pointer-events-none"></div>
+        <div class="absolute -bottom-32 -left-32 w-64 h-64 rounded-full bg-black/[0.015] pointer-events-none"></div>
 
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <!-- Cabeçalho editorial -->
-            <div class="text-center mb-10 lg:mb-12 gsap-fade-up">
-                <div class="flex items-center justify-center gap-4 mb-4">
-                    <span class="w-8 h-[2px] bg-gray-400"></span>
+            <div class="text-center mb-12 lg:mb-14 gsap-fade-up">
+                <div class="flex items-center justify-center gap-4 mb-5">
+                    <span class="w-10 h-[2px] bg-gray-400"></span>
                     <span class="text-xs font-bold text-[#1a1a1a] tracking-[0.3em] uppercase font-display">Categorias</span>
-                    <span class="w-8 h-[2px] bg-gray-400"></span>
+                    <span class="w-10 h-[2px] bg-gray-400"></span>
                 </div>
                 <h2 class="font-display font-black text-[#1a1a1a] text-4xl md:text-5xl lg:text-6xl leading-[0.9] tracking-tighter">
                     ENCONTRE<br class="sm:hidden"> O SEU ESTILO
                 </h2>
+                <p class="text-gray-400 text-sm mt-4 max-w-md mx-auto font-medium tracking-wide">
+                    Navegue por nossas categorias e descubra o que faz sentido para você.
+                </p>
             </div>
 
             @if($categorias->isNotEmpty())
-                <div class="flex flex-wrap justify-center gap-2.5 gsap-category-grid">
+                <div class="flex flex-wrap justify-center gap-3 gsap-category-grid">
                     @foreach($categorias as $categoria)
                         <a href="{{ route('home', ['categoria' => $categoria->slug]) }}"
-                           class="gsap-category-chip group inline-flex items-center gap-2.5 px-6 py-3 bg-black/80 border-2 border-black/80 text-white rounded-full text-sm font-bold tracking-wider hover:bg-white hover:text-dark hover:scale-105 hover:shadow-lg transition-all duration-400 ease-out shadow-md whitespace-nowrap">
-                            <span>{{ $categoria->nome }}</span>
-                            <span class="inline-block transition-transform duration-400 ease-out group-hover:translate-x-1 opacity-60">&rarr;</span>
+                           style="opacity: 1"
+                           class="gsap-category-chip group relative inline-flex items-center gap-2.5 px-7 py-3.5 rounded-full text-sm font-bold tracking-wider whitespace-nowrap
+                                  bg-white text-[#1a1a1a] border-2 border-gray-200
+                                  hover:border-[#1a1a1a] hover:bg-[#1a1a1a] hover:text-white
+                                  hover:scale-105 hover:shadow-xl
+                                  transition-[color,background-color,border-color,box-shadow] duration-500 ease-out shadow-[0_0_0_2px_rgba(0,0,0,0.08),0_6px_20px_-4px_rgba(0,0,0,0.12)]">
+                            <span class="relative z-10">{{ $categoria->nome }}</span>
+                            <span class="relative z-10 inline-block transition-[transform,opacity] duration-500 ease-out group-hover:translate-x-1.5 opacity-40 group-hover:opacity-100">&rarr;</span>
                         </a>
                     @endforeach
                 </div>
@@ -145,7 +153,7 @@
     </div>
 
     <!-- Seção Nova Coleção (texto + busca, sem categorias) -->
-    <div class="py-10 lg:py-12 bg-gray-50">
+    <div class="py-10 lg:py-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="gsap-fade-up">
                 <div class="flex items-center gap-3 mb-4">
@@ -156,7 +164,7 @@
             </div>
 
             <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-8 gsap-fade-up">
-                <form method="GET" action="{{ route('home') }}" class="flex items-center bg-white border border-gray-300 focus-within:border-[#1a1a1a] focus-within:shadow-sm rounded-full overflow-hidden transition-all duration-300 w-full sm:w-auto">
+                <form method="GET" action="{{ route('home') }}" class="flex items-center bg-white border border-gray-200 focus-within:border-[#1a1a1a] focus-within:shadow-[0_0_0_2px_rgba(0,0,0,0.08),0_4px_16px_rgba(0,0,0,0.08)] rounded-full overflow-hidden transition-all duration-300 w-full sm:w-auto shadow-[0_0_0_1px_rgba(0,0,0,0.06),0_2px_8px_rgba(0,0,0,0.06)]">
                     @if (request('categoria'))
                         <input type="hidden" name="categoria" value="{{ request('categoria') }}">
                     @endif
@@ -174,11 +182,8 @@
         </div>
     </div>
 
-    <!-- Gradiente de transição -->
-    <div class="h-4 lg:h-6 bg-gradient-to-b from-gray-50 to-gray-200"></div>
-
     <!-- Produtos - Grid Completo com Paginação -->
-    <div class="pb-12 lg:pb-16 bg-gray-200">
+    <div class="pb-12 lg:pb-16">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             @if ($produtos->isEmpty())
                 <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-10 text-center">
@@ -586,20 +591,25 @@
                     });
                 });
 
-                // Category chips stagger — apenas movimento, sem opacity (sempre visíveis)
+                // Category chips stagger — animação suave e sem tremor
                 const categoryChips = document.querySelectorAll('.gsap-category-chip');
                 const categoryGrid = document.querySelector('.gsap-category-grid');
                 if (categoryChips.length && categoryGrid) {
-                    gsap.from(categoryChips, {
+                    // Garante estado inicial visível antes da animação
+                    gsap.set(categoryChips, { opacity: 0, y: 30 });
+
+                    gsap.to(categoryChips, {
                         scrollTrigger: {
                             trigger: categoryGrid,
-                            start: 'top 88%',
-                            toggleActions: 'play none none none'
+                            start: 'top 85%',
+                            once: true,
                         },
-                        y: 15,
-                        duration: 0.6,
-                        stagger: 0.05,
-                        ease: 'power2.out'
+                        y: 0,
+                        opacity: 1,
+                        duration: 0.9,
+                        stagger: { each: 0.08, from: 'start' },
+                        ease: 'power3.out',
+                        clearProps: 'all'
                     });
                 }
 
@@ -618,21 +628,26 @@
                     .to('.gsap-relogio-img', { scale: 1.02, ease: 'none' }, 0);
                 }
 
-                // Product cards stagger — mais perceptível
+                // Product cards stagger — animação suave e sem tremor
                 const productsGrid = document.querySelector('.gsap-products-grid');
                 if (productsGrid) {
-                    gsap.from('.gsap-product-card', {
+                    const productCards = document.querySelectorAll('.gsap-product-card');
+
+                    gsap.set(productCards, { opacity: 0, y: 80, scale: 0.92 });
+
+                    gsap.to(productCards, {
                         scrollTrigger: {
                             trigger: productsGrid,
                             start: 'top 83%',
-                            toggleActions: 'play none none none'
+                            once: true,
                         },
-                        y: 80,
-                        opacity: 0,
-                        scale: 0.92,
+                        y: 0,
+                        opacity: 1,
+                        scale: 1,
                         duration: 1.1,
-                        stagger: 0.12,
-                        ease: 'power3.out'
+                        stagger: { each: 0.12, from: 'start' },
+                        ease: 'power3.out',
+                        clearProps: 'all'
                     });
                 }
             }

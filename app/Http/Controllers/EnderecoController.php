@@ -3,13 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Endereco;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class EnderecoController extends Controller
 {
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request)
     {
         $dados = $request->validate([
             'rotulo' => 'nullable|string|max:255',
@@ -30,9 +29,11 @@ class EnderecoController extends Controller
         return back()->with('success', 'Endereço cadastrado com sucesso.');
     }
 
-    public function destroy(Endereco $endereco): RedirectResponse
+    public function destroy(Endereco $endereco)
     {
-        abort_unless($endereco->usuario_id === Auth::id(), 403);
+        if ($endereco->usuario_id !== Auth::id()) {
+            abort(403);
+        }
 
         $endereco->delete();
 

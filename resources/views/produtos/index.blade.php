@@ -1,6 +1,6 @@
 <x-app-layout>
     <!-- Seção de Filtros (Busca + Categorias) - estilo editorial igual à home -->
-    <div class="py-10 lg:py-12 bg-gray-50">
+    <div class="py-10 lg:py-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="gsap-fade-up">
                 <div class="flex items-center gap-3 mb-4">
@@ -13,7 +13,7 @@
             </div>
 
             <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-8 gsap-fade-up">
-                <form method="GET" action="{{ route('produtos.index') }}" class="flex items-center bg-white border border-gray-300 focus-within:border-[#1a1a1a] focus-within:shadow-sm rounded-full overflow-hidden transition-all duration-300 w-full sm:w-auto">
+                <form method="GET" action="{{ route('produtos.index') }}" class="flex items-center bg-white border border-gray-200 focus-within:border-[#1a1a1a] focus-within:shadow-[0_0_0_2px_rgba(0,0,0,0.08),0_4px_16px_rgba(0,0,0,0.08)] rounded-full overflow-hidden transition-all duration-300 w-full sm:w-auto shadow-[0_0_0_1px_rgba(0,0,0,0.06),0_2px_8px_rgba(0,0,0,0.06)]">
                     @if (request('categoria'))
                         <input type="hidden" name="categoria" value="{{ request('categoria') }}">
                     @endif
@@ -32,21 +32,23 @@
             @if ($categorias->isNotEmpty())
                 <div class="flex flex-wrap justify-start gap-2.5 gsap-category-grid">
                     <a href="{{ route('produtos.index', array_filter(['q' => request('q')])) }}"
-                       class="gsap-category-chip group inline-flex items-center gap-2.5 px-6 py-3 rounded-full text-sm font-bold tracking-wider transition-all duration-400 ease-out whitespace-nowrap
+                       style="opacity: 1"
+                       class="gsap-category-chip group inline-flex items-center gap-2.5 px-6 py-3 rounded-full text-sm font-bold tracking-wider transition-[color,background-color,border-color,box-shadow] duration-400 ease-out whitespace-nowrap
                               {{ !request('categoria')
-                                  ? 'bg-black/80 border-2 border-black/80 text-white shadow-md hover:bg-white hover:text-dark hover:scale-105 hover:shadow-lg'
-                                  : 'bg-white border-2 border-gray-200 text-dark hover:bg-dark hover:text-white hover:border-dark hover:scale-105 hover:shadow-lg' }}">
+                                  ? 'bg-black/80 border-2 border-black text-white shadow-[0_0_0_2px_rgba(0,0,0,0.15),0_6px_20px_-4px_rgba(0,0,0,0.18)] hover:bg-white hover:text-dark hover:scale-105 hover:shadow-xl'
+                                  : 'bg-white border-2 border-gray-200 text-dark shadow-[0_0_0_2px_rgba(0,0,0,0.08),0_6px_20px_-4px_rgba(0,0,0,0.12)] hover:bg-dark hover:text-white hover:border-dark hover:scale-105 hover:shadow-xl' }}">
                         Todas
-                        <span class="inline-block transition-transform duration-400 ease-out group-hover:translate-x-1 opacity-60">&rarr;</span>
+                        <span class="inline-block transition-[transform,opacity] duration-400 ease-out group-hover:translate-x-1 opacity-60">&rarr;</span>
                     </a>
                     @foreach ($categorias as $categoria)
                         <a href="{{ route('produtos.index', array_filter(['categoria' => $categoria->slug, 'q' => request('q')])) }}"
-                           class="gsap-category-chip group inline-flex items-center gap-2.5 px-6 py-3 rounded-full text-sm font-bold tracking-wider transition-all duration-400 ease-out whitespace-nowrap
+                           style="opacity: 1"
+                           class="gsap-category-chip group inline-flex items-center gap-2.5 px-6 py-3 rounded-full text-sm font-bold tracking-wider transition-[color,background-color,border-color,box-shadow] duration-400 ease-out whitespace-nowrap
                                   {{ request('categoria') === $categoria->slug
-                                      ? 'bg-black/80 border-2 border-black/80 text-white shadow-md hover:bg-white hover:text-dark hover:scale-105 hover:shadow-lg'
-                                      : 'bg-white border-2 border-gray-200 text-dark hover:bg-dark hover:text-white hover:border-dark hover:scale-105 hover:shadow-lg' }}">
+                                      ? 'bg-black/80 border-2 border-black text-white shadow-[0_0_0_2px_rgba(0,0,0,0.15),0_6px_20px_-4px_rgba(0,0,0,0.18)] hover:bg-white hover:text-dark hover:scale-105 hover:shadow-xl'
+                                      : 'bg-white border-2 border-gray-200 text-dark shadow-[0_0_0_2px_rgba(0,0,0,0.08),0_6px_20px_-4px_rgba(0,0,0,0.12)] hover:bg-dark hover:text-white hover:border-dark hover:scale-105 hover:shadow-xl' }}">
                             {{ $categoria->nome }}
-                            <span class="inline-block transition-transform duration-400 ease-out group-hover:translate-x-1 opacity-60">&rarr;</span>
+                            <span class="inline-block transition-[transform,opacity] duration-400 ease-out group-hover:translate-x-1 opacity-60">&rarr;</span>
                         </a>
                     @endforeach
                 </div>
@@ -54,11 +56,8 @@
         </div>
     </div>
 
-    <!-- Gradiente de transição (mesmo espaçamento da home) -->
-    <div class="h-4 lg:h-6 bg-gradient-to-b from-gray-50 to-gray-200"></div>
-
     <!-- Seção de Produtos - Grid -->    
-    <div class="pb-12 lg:pb-16 bg-gray-200">
+    <div class="pb-12 lg:pb-16">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             @if ($produtos->isEmpty())
                 <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-10 text-center">
@@ -91,20 +90,24 @@
                         return;
                     }
 
-                    // Category chips stagger — apenas movimento, sem opacity (sempre visíveis)
+                    // Category chips stagger — animação suave, sem tremor
                     const categoryChips = document.querySelectorAll('.gsap-category-chip');
                     const categoryGrid = document.querySelector('.gsap-category-grid');
                     if (categoryChips.length && categoryGrid) {
-                        gsap.from(categoryChips, {
+                        gsap.set(categoryChips, { opacity: 0, y: 30 });
+
+                        gsap.to(categoryChips, {
                             scrollTrigger: {
                                 trigger: categoryGrid,
-                                start: 'top 88%',
-                                toggleActions: 'play none none none'
+                                start: 'top 85%',
+                                once: true,
                             },
-                            y: 15,
-                            duration: 0.6,
-                            stagger: 0.05,
-                            ease: 'power2.out'
+                            y: 0,
+                            opacity: 1,
+                            duration: 0.9,
+                            stagger: { each: 0.08, from: 'start' },
+                            ease: 'power3.out',
+                            clearProps: 'all'
                         });
                     }
 
@@ -123,21 +126,26 @@
                         });
                     });
 
-                    // Product cards stagger (mesmo da home)
+                    // Product cards stagger — animação suave e sem tremor
                     const productsGrid = document.querySelector('.gsap-products-grid');
                     if (productsGrid) {
-                        gsap.from('.gsap-product-card', {
+                        const productCards = document.querySelectorAll('.gsap-product-card');
+
+                        gsap.set(productCards, { opacity: 0, y: 80, scale: 0.92 });
+
+                        gsap.to(productCards, {
                             scrollTrigger: {
                                 trigger: productsGrid,
                                 start: 'top 83%',
-                                toggleActions: 'play none none none'
+                                once: true,
                             },
-                            y: 80,
-                            opacity: 0,
-                            scale: 0.92,
+                            y: 0,
+                            opacity: 1,
+                            scale: 1,
                             duration: 1.1,
-                            stagger: 0.12,
-                            ease: 'power3.out'
+                            stagger: { each: 0.12, from: 'start' },
+                            ease: 'power3.out',
+                            clearProps: 'all'
                         });
                     }
                 };

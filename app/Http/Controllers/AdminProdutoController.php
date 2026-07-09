@@ -4,10 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Produto;
 use App\Models\Categoria;
-use App\Models\ImagemProduto;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 class AdminProdutoController extends Controller
 {
@@ -43,10 +40,9 @@ class AdminProdutoController extends Controller
 
         if ($request->hasFile('imagem')) {
             $path = $request->file('imagem')->store('produtos', 'public');
-            
-            // Mark others as not principal
+
             $produto->imagens()->update(['principal' => false]);
-            
+
             $produto->imagens()->create([
                 'caminho' => $path,
                 'principal' => true,

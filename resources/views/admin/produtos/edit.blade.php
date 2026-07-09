@@ -12,7 +12,7 @@
 
     <div class="py-10 pb-24">
         <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm rounded-2xl border border-gray-100 p-6">
+            <div class="bg-white overflow-hidden shadow-sm rounded-2xl border border-gray-200 p-6">
                 
                 @if ($errors->any())
                     <div class="mb-4 text-rose-600 text-sm">

@@ -7,21 +7,20 @@ use App\Models\Carrinho;
 use App\Models\Endereco;
 use App\Models\Pedido;
 use App\Models\Cupom;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use DomainException;
 
 class CheckoutController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $carrinho = Carrinho::where('usuario_id', Auth::id())->with('itens.produto')->first();
-        
+        $carrinho = Carrinho::where('usuario_id', $request->user()->id)->with('itens.produto')->first();
+
         if (! $carrinho || $carrinho->itens->isEmpty()) {
             return redirect()->route('carrinho.index')->with('error', 'Seu carrinho está vazio.');
         }
 
-        $enderecos = Endereco::where('usuario_id', Auth::id())->get();
+        $enderecos = Endereco::where('usuario_id', $request->user()->id)->get();
+
         return view('checkout.index', compact('carrinho', 'enderecos'));
     }
 
@@ -33,7 +32,7 @@ class CheckoutController extends Controller
             'codigo_cupom' => 'nullable|string'
         ]);
 
-        $usuario = Auth::user();
+        $usuario = $request->user();
         $carrinho = Carrinho::where('usuario_id', $usuario->id)->with('itens.produto')->first();
 
         if (! $carrinho || $carrinho->itens->isEmpty()) {
@@ -48,11 +47,14 @@ class CheckoutController extends Controller
 
                 $desconto = 0;
                 $cupom = null;
+
                 if ($request->codigo_cupom) {
                     $cupom = Cupom::where('codigo', $request->codigo_cupom)->first();
+
                     if (! $cupom || ! $cupom->valido()) {
-                        throw new DomainException('Cupom inválido ou expirado.');
+                        throw new \Exception('Cupom inválido ou expirado.');
                     }
+
                     $desconto = $cupom->calcularDesconto($subtotal);
                 }
 
@@ -61,7 +63,7 @@ class CheckoutController extends Controller
                     'cupom_id' => $cupom?->id,
                     'subtotal' => $subtotal,
                     'desconto' => $desconto,
-                    'frete' => 0, // simplificado
+                    'frete' => 0,
                     'total' => $subtotal - $desconto,
                     'metodo_pagamento' => $request->metodo_pagamento,
                     'endereco_entrega' => $endereco->only(['rua', 'numero', 'complemento', 'bairro', 'cidade', 'estado', 'cep']),
@@ -79,12 +81,11 @@ class CheckoutController extends Controller
                     $item->produto()->decrement('estoque', $item->quantidade);
                 }
 
-                // Limpa o carrinho
                 $carrinho->itens()->delete();
 
                 return $pedido;
             });
-        } catch (DomainException $e) {
+        } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());
         }
 

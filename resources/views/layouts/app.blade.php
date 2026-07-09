@@ -30,7 +30,7 @@
             }
         </style>
     </head>
-    <body class="font-sans text-dark antialiased bg-white selection:bg-primary selection:text-dark" style="zoom: 0.8;">
+    <body class="font-sans text-dark antialiased bg-[#f0f0ee] selection:bg-primary selection:text-dark" style="zoom: 0.8;">
         
         <div class="min-h-screen flex flex-col">
             

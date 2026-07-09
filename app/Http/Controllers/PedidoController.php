@@ -9,7 +9,9 @@ class PedidoController extends Controller
 {
     public function show(Pedido $pedido)
     {
-        abort_unless($pedido->usuario_id === Auth::id(), 403);
+        if ($pedido->usuario_id !== Auth::id()) {
+            abort(403);
+        }
 
         $pedido->load('itens');
 

@@ -9,7 +9,7 @@
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8 space-y-6">
 
             @if ($enderecos->isEmpty())
-                <div class="bg-white border border-gray-100 shadow-sm rounded-2xl p-6">
+                <div class="bg-white border border-gray-200 shadow-sm rounded-2xl p-6">
                     <h3 class="font-display font-semibold text-gray-900 mb-4">
                         <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-violet-600 text-white text-xs mr-2">1</span>
                         Cadastrar endereço de entrega
@@ -55,7 +55,7 @@
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('checkout.store') }}" class="bg-white border border-gray-100 shadow-sm rounded-2xl p-6 space-y-8">
+            <form method="POST" action="{{ route('checkout.store') }}" class="bg-white border border-gray-200 shadow-sm rounded-2xl p-6 space-y-8">
                 @csrf
 
                 {{-- Resumo do pedido --}}
