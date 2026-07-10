@@ -207,6 +207,11 @@ class ProductSeeder extends Seeder
     //  Se a API falhar, cai no fallback de SVGs profissionais.
     // ========================================================================
 
+<<<<<<< HEAD
+=======
+    private const PEXELS_API_KEY = 'REMOVIDO_POR_SEGURANCA';
+
+>>>>>>> HASH_REMOVIDO_POR_SEGURANCA
     private function gerarGaleriaDeImagens(Produto $produto, string $slug, string $nome, array $paleta): void
     {
         $produto->imagens()->delete();
@@ -336,7 +341,11 @@ class ProductSeeder extends Seeder
     {
         try {
             $response = Http::timeout(15)
+<<<<<<< HEAD
                 ->withHeaders(['Authorization' => config('services.pexels.key')])
+=======
+                ->withHeaders(['Authorization' => self::PEXELS_API_KEY])
+>>>>>>> HASH_REMOVIDO_POR_SEGURANCA
                 ->get('https://api.pexels.com/v1/search', [
                     'query' => $query,
                     'per_page' => 3,
