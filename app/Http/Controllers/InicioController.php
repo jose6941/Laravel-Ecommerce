@@ -14,10 +14,7 @@ class InicioController extends Controller
 
         $produtos = Produto::ativo()
             ->with(['categoria', 'imagemPrincipal'])
-            ->when($request->filled('categoria'), fn ($q) =>
-                $q->whereHas('categoria', fn ($c) => $c->where('slug', $request->categoria)))
-            ->when($request->filled('q'), fn ($q) =>
-                $q->where('nome', 'like', "%{$request->q}%"))
+            ->filtrar($request->categoria, $request->q)
             ->orderBy('destaque', 'desc')
             ->orderBy('created_at', 'desc')
             ->paginate(12)

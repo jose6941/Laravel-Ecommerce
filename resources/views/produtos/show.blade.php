@@ -143,8 +143,9 @@
                     </div>
 
                     <!-- Add to Cart Form -->
-                    <form method="POST" action="{{ route('carrinho.store', $produto) }}" class="flex-1 w-full">
+                    <form method="POST" action="{{ route('carrinho.store') }}" class="flex-1 w-full">
                         @csrf
+                        <input type="hidden" name="produto_id" value="{{ $produto->id }}">
                         <input type="hidden" name="quantidade" value="1" x-bind:value="count">
                         <button type="submit"
                                 class="w-full h-14 bg-[#1a1a1a] text-white rounded-full font-bold text-base hover:bg-gray-800 transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-2.5 group">

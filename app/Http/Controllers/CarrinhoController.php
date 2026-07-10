@@ -28,8 +28,9 @@ class CarrinhoController extends Controller
         return view('carrinho.index', compact('carrinho'));
     }
 
-    public function store(Produto $produto, Request $request)
+    public function store(Request $request)
     {
+        $produto = Produto::findOrFail($request->produto_id);
         $usuario = Auth::user();
         $sessaoId = session()->getId();
 
@@ -58,35 +59,35 @@ class CarrinhoController extends Controller
         return redirect()->route('carrinho.index')->with('success', 'Produto adicionado ao carrinho.');
     }
 
-    public function update(ItemCarrinho $item, Request $request)
+    public function update(Request $request, ItemCarrinho $carrinho)
     {
         $usuario = Auth::user();
         $sessaoId = session()->getId();
 
-        $carrinho = Carrinho::where($usuario ? 'usuario_id' : 'sessao_id', $usuario ? $usuario->id : $sessaoId)->first();
+        $carrinhoUsuario = Carrinho::where($usuario ? 'usuario_id' : 'sessao_id', $usuario ? $usuario->id : $sessaoId)->first();
 
-        if (! $carrinho || $item->carrinho_id !== $carrinho->id) {
+        if (! $carrinhoUsuario || $carrinho->carrinho_id !== $carrinhoUsuario->id) {
             abort(403);
         }
 
         $request->validate(['quantidade' => 'required|integer|min:1']);
-        $item->update(['quantidade' => $request->quantidade]);
+        $carrinho->update(['quantidade' => $request->quantidade]);
 
         return back()->with('success', 'Carrinho atualizado.');
     }
 
-    public function destroy(ItemCarrinho $item)
+    public function destroy(ItemCarrinho $carrinho)
     {
         $usuario = Auth::user();
         $sessaoId = session()->getId();
 
-        $carrinho = Carrinho::where($usuario ? 'usuario_id' : 'sessao_id', $usuario ? $usuario->id : $sessaoId)->first();
+        $carrinhoUsuario = Carrinho::where($usuario ? 'usuario_id' : 'sessao_id', $usuario ? $usuario->id : $sessaoId)->first();
 
-        if (! $carrinho || $item->carrinho_id !== $carrinho->id) {
+        if (! $carrinhoUsuario || $carrinho->carrinho_id !== $carrinhoUsuario->id) {
             abort(403);
         }
 
-        $item->delete();
+        $carrinho->delete();
 
         return back()->with('success', 'Produto removido do carrinho.');
     }

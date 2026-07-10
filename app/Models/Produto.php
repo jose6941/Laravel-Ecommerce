@@ -49,7 +49,7 @@ class Produto extends Model
     public function imagemPrincipal()
     {
         return $this->hasOne(ImagemProduto::class)
-            ->orderByDesc('principal')
+            ->where('principal', true)
             ->orderBy('ordem');
     }
 
@@ -60,6 +60,15 @@ class Produto extends Model
     public function scopeDestaque(Builder $q): Builder
     { 
         return $q->where('destaque', true); 
+    }
+
+    public function scopeFiltrar(Builder $q, ?string $categoria = null, ?string $search = null): Builder
+    {
+        return $q
+            ->when($categoria, fn ($q) =>
+                $q->whereHas('categoria', fn ($c) => $c->where('slug', $categoria)))
+            ->when($search, fn ($q) =>
+                $q->where('nome', 'like', "%{$search}%"));
     }
 
     public function getPrecoFinalAttribute(): float
