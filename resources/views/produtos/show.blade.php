@@ -24,11 +24,18 @@
                      x-ref="imageContainer">
 
                     @if ($produto->imagens->isNotEmpty())
-                        <!-- Base image -->
-                        <img :src="activeImage"
-                             alt="{{ $produto->nome }}"
-                             class="w-full h-full object-contain select-none"
-                             draggable="false">
+                        <!-- Base image with lazy load + skeleton -->
+                        <div x-data="{ imgLoaded: false }" :key="activeImage" class="absolute inset-0 w-full h-full">
+                            <div x-show="!imgLoaded" class="absolute inset-0 shimmer z-10"></div>
+                            <img :src="activeImage"
+                                 alt="{{ $produto->nome }}"
+                                 loading="lazy"
+                                 x-on:load="imgLoaded = true"
+                                 x-on:error="imgLoaded = true"
+                                 x-bind:class="imgLoaded ? 'opacity-100' : 'opacity-0'"
+                                 class="w-full h-full object-contain select-none transition-opacity duration-500"
+                                 draggable="false">
+                        </div>
 
                         <!-- Lens (follows cursor) -->
                         <div x-show="lensActive"
@@ -68,9 +75,7 @@
                             <button @click="setActive('{{ $imagem->url }}')"
                                     class="shrink-0 w-20 h-20 rounded-xl bg-[#f5f5f5] overflow-hidden border-2 transition-all duration-300 hover:border-[#1a1a1a]/40"
                                     :class="activeImage === '{{ $imagem->url }}' ? 'border-[#1a1a1a] ring-1 ring-[#1a1a1a]/20' : 'border-transparent'">
-                                <img src="{{ $imagem->url }}"
-                                     alt="{{ $produto->nome }}"
-                                     class="w-full h-full object-contain p-1.5">
+                                <x-img-skeleton src="{{ $imagem->url }}" alt="{{ $produto->nome }}" class="w-full h-full object-contain" />
                             </button>
                         @endforeach
                     </div>
@@ -81,12 +86,12 @@
             <div class="lg:w-[45%] w-full flex flex-col justify-center max-w-lg mx-auto lg:mx-0">
                 <!-- Badges -->
                 <div class="flex items-center gap-3 mb-4 gsap-hero-text">
-                    <span class="bg-[#1a1a1a] text-white text-[10px] font-bold px-3 py-1.5 rounded-full uppercase tracking-wider">
+                    <span class="bg-emerald-600 text-white text-[10px] font-bold px-3 py-1.5 rounded-full uppercase tracking-wider">
                         {{ $produto->estoque > 0 ? 'Disponível' : 'Indisponível' }}
                     </span>
                     @if ($produto->preco_promocional)
-                        <span class="bg-red-50 text-red-600 text-[10px] font-bold px-3 py-1.5 rounded-full uppercase tracking-wider">
-                            Promoção
+                        <span class="bg-brand text-white text-[10px] font-bold px-3 py-1.5 rounded-full uppercase tracking-wider">
+                            PROMOÇÃO
                         </span>
                     @endif
                 </div>
@@ -134,9 +139,9 @@
                 </div>
 
                 <!-- Actions -->
-                <div class="flex flex-col sm:flex-row items-center gap-4 mb-10 gsap-hero-text">
+                <div x-data="{ count: 1 }" class="flex flex-col sm:flex-row items-center gap-4 mb-10 gsap-hero-text">
                     <!-- Quantity Control -->
-                    <div x-data="{ count: 1 }" class="flex items-center bg-gray-50 rounded-full h-14 px-2 w-full sm:w-auto shrink-0 border border-gray-100">
+                    <div class="flex items-center bg-gray-50 rounded-full h-14 px-2 w-full sm:w-auto shrink-0 border border-gray-100">
                         <button @click="count = Math.max(1, count - 1)" class="w-10 h-10 rounded-full flex items-center justify-center hover:bg-white hover:shadow transition text-xl font-medium text-gray-600 hover:text-[#1a1a1a]">-</button>
                         <input type="text" x-model="count" class="w-12 h-full border-none bg-transparent text-center focus:ring-0 font-bold text-lg text-[#1a1a1a]" readonly>
                         <button @click="count++" class="w-10 h-10 rounded-full flex items-center justify-center bg-white shadow-sm hover:shadow-md transition text-xl font-medium text-gray-600 hover:text-[#1a1a1a]">+</button>
@@ -148,7 +153,7 @@
                         <input type="hidden" name="produto_id" value="{{ $produto->id }}">
                         <input type="hidden" name="quantidade" value="1" x-bind:value="count">
                         <button type="submit"
-                                class="w-full h-14 bg-[#1a1a1a] text-white rounded-full font-bold text-base hover:bg-gray-800 transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-2.5 group">
+                                class="w-full h-14 bg-brand text-white rounded-full font-bold text-base hover:bg-brand-dark transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-0.5 flex items-center justify-center gap-2.5 group">
                             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.836l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 1.994-4.694 2.608-7.164.075-.3-.155-.586-.464-.586H5.106M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
                             </svg>

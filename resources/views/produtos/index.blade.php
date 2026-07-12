@@ -23,7 +23,7 @@
                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                     </button>
                 </form>
-                <a href="{{ route('produtos.index') }}" class="inline-flex items-center gap-2 bg-dark text-white px-8 py-3.5 text-base font-bold tracking-widest uppercase rounded-full hover:bg-gray-800 transition-all duration-300 hover:shadow-lg shrink-0">
+                <a href="{{ route('produtos.index') }}" class="inline-flex items-center gap-2 bg-brand text-white px-8 py-3.5 text-base font-bold tracking-widest uppercase rounded-full hover:bg-brand-dark transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 shrink-0">
                     TODOS OS PRODUTOS
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
                 </a>

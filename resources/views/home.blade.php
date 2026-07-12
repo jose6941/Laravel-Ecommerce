@@ -38,7 +38,7 @@
                     <!-- CTA - Apenas o botão de comprar agora -->
                     <div class="gsap-banner-item flex flex-wrap items-center gap-3">
                         <a href="{{ route('home') }}"
-                           class="inline-flex items-center gap-2.5 bg-[#1a1a1a] text-white px-10 py-[18px] text-sm font-bold tracking-[0.15em] uppercase rounded-full hover:bg-gray-800 transition-all duration-300 shadow-lg hover:shadow-xl">
+                           class="inline-flex items-center gap-2.5 bg-brand text-white px-10 py-[18px] text-sm font-bold tracking-[0.15em] uppercase rounded-full hover:bg-brand-dark transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-0.5">
                             COMPRAR AGORA
                             <svg class="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
                         </a>
@@ -83,14 +83,13 @@
         </div>
     </div>
 
-    <!-- Categorias Section -->
+    <!-- Categorias Section - Visual Cards -->
     <div class="relative py-16 lg:py-20 overflow-hidden">
-        <!-- Elemento decorativo de fundo: círculo sutil para dar profundidade -->
         <div class="absolute -top-40 -right-40 w-80 h-80 rounded-full bg-black/[0.02] pointer-events-none"></div>
         <div class="absolute -bottom-32 -left-32 w-64 h-64 rounded-full bg-black/[0.015] pointer-events-none"></div>
 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <!-- Cabeçalho editorial -->
+            <!-- Header -->
             <div class="text-center mb-12 lg:mb-14 gsap-fade-up">
                 <div class="flex items-center justify-center gap-4 mb-5">
                     <span class="w-10 h-[2px] bg-gray-400"></span>
@@ -106,17 +105,48 @@
             </div>
 
             @if($categorias->isNotEmpty())
-                <div class="flex flex-wrap justify-center gap-3 gsap-category-grid">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 gsap-category-grid">
                     @foreach($categorias as $categoria)
                         <a href="{{ route('home', ['categoria' => $categoria->slug]) }}"
-                           style="opacity: 1"
-                           class="gsap-category-chip group relative inline-flex items-center gap-2.5 px-7 py-3.5 rounded-full text-sm font-bold tracking-wider whitespace-nowrap
-                                  bg-white text-[#1a1a1a] border-2 border-gray-200
-                                  hover:border-[#1a1a1a] hover:bg-[#1a1a1a] hover:text-white
-                                  hover:scale-105 hover:shadow-xl
-                                  transition-[color,background-color,border-color,box-shadow] duration-500 ease-out shadow-[0_0_0_2px_rgba(0,0,0,0.08),0_6px_20px_-4px_rgba(0,0,0,0.12)]">
-                            <span class="relative z-10">{{ $categoria->nome }}</span>
-                            <span class="relative z-10 inline-block transition-[transform,opacity] duration-500 ease-out group-hover:translate-x-1.5 opacity-40 group-hover:opacity-100">&rarr;</span>
+                           class="gsap-category-card group relative block aspect-[4/5] rounded-2xl overflow-hidden bg-gray-200 shadow-lg hover:shadow-2xl transition-all duration-500">
+                            
+                            <!-- Background Image -->
+                            @if($categoria->imagem_fundo)
+                                <div class="absolute inset-0 w-full h-full overflow-hidden">
+                                    <x-img-skeleton src="{{ $categoria->imagem_fundo }}"
+                                         alt="{{ $categoria->nome }}"
+                                         wrapperClass="absolute inset-0"
+                                         class="w-full h-full object-cover transition-all duration-700 ease-out group-hover:scale-110 group-hover:rotate-[2deg]" />
+                                </div>
+                            @else
+                                <div class="absolute inset-0 bg-gradient-to-br from-gray-300 to-gray-100"></div>
+                            @endif
+
+                            <!-- Gradient Overlay -->
+                            <div class="absolute inset-0 bg-gradient-to-t from-dark/85 via-dark/25 to-transparent transition-all duration-500 group-hover:from-dark/70"></div>
+
+                            <!-- Content at Bottom -->
+                            <div class="absolute bottom-0 left-0 right-0 p-6 sm:p-7">
+                                <h3 class="font-display font-bold text-white text-xl sm:text-2xl leading-tight mb-1.5">
+                                    {{ $categoria->nome }}
+                                </h3>
+                                @if($categoria->descricao)
+                                    <p class="text-white/60 text-xs sm:text-sm font-medium leading-relaxed line-clamp-2">
+                                        {{ $categoria->descricao }}
+                                    </p>
+                                @endif
+                                
+                                <!-- Shop Now CTA (appears on hover) -->
+                                <div class="mt-3 opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-400 ease-out">
+                                    <span class="inline-flex items-center gap-1.5 text-xs font-bold text-brand tracking-wider uppercase">
+                                        Shop Now
+                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Subtle border on hover -->
+                            <div class="absolute inset-0 ring-1 ring-inset ring-white/10 rounded-2xl group-hover:ring-brand/40 transition-all duration-500"></div>
                         </a>
                     @endforeach
                 </div>
@@ -129,23 +159,31 @@
     </div>
 
     <!-- Info Bar -->
-    <div class="bg-dark text-white py-6">
+    <div class="bg-dark text-white py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center md:text-left divide-x divide-gray-800">
-                <div class="flex items-center justify-center md:justify-start gap-3 px-4">
-                    <svg class="w-6 h-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" /></svg>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <div class="flex items-center justify-center md:justify-start gap-4 px-4 py-2">
+                    <div class="w-11 h-11 rounded-xl bg-brand/20 flex items-center justify-center shrink-0">
+                        <svg class="w-5 h-5 text-brand-light" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" /></svg>
+                    </div>
                     <div><p class="font-bold text-sm">Free Shipping</p><p class="text-xs text-gray-400">On all orders</p></div>
                 </div>
-                <div class="flex items-center justify-center md:justify-start gap-3 px-4">
-                    <svg class="w-6 h-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                <div class="flex items-center justify-center md:justify-start gap-4 px-4 py-2">
+                    <div class="w-11 h-11 rounded-xl bg-brand/20 flex items-center justify-center shrink-0">
+                        <svg class="w-5 h-5 text-brand-light" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                    </div>
                     <div><p class="font-bold text-sm">Easy Returns</p><p class="text-xs text-gray-400">14 days returns</p></div>
                 </div>
-                <div class="flex items-center justify-center md:justify-start gap-3 px-4">
-                    <svg class="w-6 h-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.965 11.965 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                <div class="flex items-center justify-center md:justify-start gap-4 px-4 py-2">
+                    <div class="w-11 h-11 rounded-xl bg-brand/20 flex items-center justify-center shrink-0">
+                        <svg class="w-5 h-5 text-brand-light" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.965 11.965 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                    </div>
                     <div><p class="font-bold text-sm">100% Authentic</p><p class="text-xs text-gray-400">Original Products</p></div>
                 </div>
-                <div class="flex items-center justify-center md:justify-start gap-3 px-4">
-                    <svg class="w-6 h-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                <div class="flex items-center justify-center md:justify-start gap-4 px-4 py-2">
+                    <div class="w-11 h-11 rounded-xl bg-brand/20 flex items-center justify-center shrink-0">
+                        <svg class="w-5 h-5 text-brand-light" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                    </div>
                     <div><p class="font-bold text-sm">Secure Payment</p><p class="text-xs text-gray-400">100% Secure</p></div>
                 </div>
             </div>
@@ -174,7 +212,7 @@
                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                     </button>
                 </form>
-                <a href="{{ route('home') }}" class="inline-flex items-center gap-2 bg-dark text-white px-8 py-3.5 text-base font-bold tracking-widest uppercase rounded-full hover:bg-gray-800 transition-all duration-300 hover:shadow-lg shrink-0">
+                <a href="{{ route('home') }}" class="inline-flex items-center gap-2 bg-brand text-white px-8 py-3.5 text-base font-bold tracking-widest uppercase rounded-full hover:bg-brand-dark transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 shrink-0">
                     TODOS OS MODELOS
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
                 </a>
@@ -245,7 +283,7 @@
                     <!-- CTA -->
                     <div class="gsap-airpod-item flex flex-wrap items-center gap-3 lg:justify-start justify-center">
                         <a href="{{ route('home', ['categoria' => 'eletronicos']) }}"
-                           class="inline-flex items-center gap-2.5 bg-[#1a1a1a] text-white px-10 py-[18px] text-sm font-bold tracking-[0.15em] uppercase rounded-full hover:bg-gray-800 transition-all duration-300 shadow-lg hover:shadow-xl">
+                           class="inline-flex items-center gap-2.5 bg-brand text-white px-10 py-[18px] text-sm font-bold tracking-[0.15em] uppercase rounded-full hover:bg-brand-dark transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-0.5">
                             COMPRAR AGORA
                             <svg class="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
                         </a>
@@ -569,23 +607,23 @@
                     });
                 });
 
-                // Category chips stagger — animação suave e sem tremor
-                const categoryChips = document.querySelectorAll('.gsap-category-chip');
+                // Category cards stagger — animação suave e premium
+                const categoryCards = document.querySelectorAll('.gsap-category-card');
                 const categoryGrid = document.querySelector('.gsap-category-grid');
-                if (categoryChips.length && categoryGrid) {
-                    // Garante estado inicial visível antes da animação
-                    gsap.set(categoryChips, { opacity: 0, y: 30 });
+                if (categoryCards.length && categoryGrid) {
+                    gsap.set(categoryCards, { opacity: 0, y: 60, scale: 0.95 });
 
-                    gsap.to(categoryChips, {
+                    gsap.to(categoryCards, {
                         scrollTrigger: {
                             trigger: categoryGrid,
-                            start: 'top 85%',
+                            start: 'top 80%',
                             once: true,
                         },
                         y: 0,
                         opacity: 1,
-                        duration: 0.9,
-                        stagger: { each: 0.08, from: 'start' },
+                        scale: 1,
+                        duration: 1.0,
+                        stagger: { each: 0.15, from: 'start' },
                         ease: 'power3.out',
                         clearProps: 'all'
                     });

@@ -12,11 +12,16 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['Inter', ...defaultTheme.fontFamily.sans],
-                display: ['Outfit', 'Inter', ...defaultTheme.fontFamily.sans],
+                sans: ['Open Sans', ...defaultTheme.fontFamily.sans],
+                display: ['Clash Display', ...defaultTheme.fontFamily.sans],
             },
             colors: {
-                primary: '#e2e8f0', // Silver/slate tone
+                brand: {
+                    DEFAULT: '#f59e0b',
+                    dark: '#d97706',
+                    light: '#fbbf24',
+                    bg: '#fffbeb',
+                },
                 dark: '#0A0A0A',
                 light: '#F8F9FA',
             }

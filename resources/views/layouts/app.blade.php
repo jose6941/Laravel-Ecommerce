@@ -9,7 +9,9 @@
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700,800|outfit:400,500,600,700,800,900&display=swap" rel="stylesheet" />
+        <link rel="preconnect" href="https://api.fontshare.com">
+        <link href="https://fonts.bunny.net/css?family=open-sans:300,400,500,600,700,800&display=swap" rel="stylesheet" />
+        <link href="https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&display=swap" rel="stylesheet" />
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -30,7 +32,7 @@
             }
         </style>
     </head>
-    <body class="font-sans text-dark antialiased bg-[#f0f0ee] selection:bg-primary selection:text-dark" style="zoom: 0.8;">
+    <body class="font-sans text-dark antialiased bg-[#f0f0ee] selection:bg-brand selection:text-white">
         
         <div class="min-h-screen flex flex-col">
             
@@ -70,38 +72,38 @@
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div class="grid grid-cols-1 md:grid-cols-5 gap-8 border-b border-gray-800 pb-12 mb-8">
                         <div class="md:col-span-2">
-                            <h3 class="text-3xl font-display font-bold mb-4 tracking-tight">Heepzy<br><span class="text-primary text-xl">S N E A K E R S</span></h3>
+                            <h3 class="text-3xl font-display font-bold mb-4 tracking-tight">Heepzy<br><span class="text-brand text-xl">S N E A K E R S</span></h3>
                             <p class="text-gray-400 text-sm mb-6 max-w-xs">Built for every move, every mood. Experience the ultimate comfort and style.</p>
                             <div class="flex gap-4">
-                                <a href="#" class="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center hover:bg-primary hover:text-dark transition">F</a>
-                                <a href="#" class="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center hover:bg-primary hover:text-dark transition">T</a>
-                                <a href="#" class="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center hover:bg-primary hover:text-dark transition">I</a>
+                                <a href="#" class="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center hover:bg-brand hover:text-white transition">F</a>
+                                <a href="#" class="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center hover:bg-brand hover:text-white transition">T</a>
+                                <a href="#" class="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center hover:bg-brand hover:text-white transition">I</a>
                             </div>
                         </div>
                         <div>
                             <h4 class="font-semibold text-sm tracking-wider uppercase text-gray-500 mb-4">Shop</h4>
                             <ul class="space-y-3 text-sm text-gray-300">
-                                <li><a href="#" class="hover:text-primary transition">All Sneakers</a></li>
-                                <li><a href="#" class="hover:text-primary transition">Best Sellers</a></li>
-                                <li><a href="#" class="hover:text-primary transition">New Arrivals</a></li>
-                                <li><a href="#" class="hover:text-primary transition">Collections</a></li>
+                                <li><a href="#" class="hover:text-brand-light transition">All Sneakers</a></li>
+                                <li><a href="#" class="hover:text-brand-light transition">Best Sellers</a></li>
+                                <li><a href="#" class="hover:text-brand-light transition">New Arrivals</a></li>
+                                <li><a href="#" class="hover:text-brand-light transition">Collections</a></li>
                             </ul>
                         </div>
                         <div>
                             <h4 class="font-semibold text-sm tracking-wider uppercase text-gray-500 mb-4">Company</h4>
                             <ul class="space-y-3 text-sm text-gray-300">
-                                <li><a href="#" class="hover:text-primary transition">Our Story</a></li>
-                                <li><a href="#" class="hover:text-primary transition">Careers</a></li>
-                                <li><a href="#" class="hover:text-primary transition">Sustainability</a></li>
-                                <li><a href="#" class="hover:text-primary transition">Press</a></li>
+                                <li><a href="#" class="hover:text-brand-light transition">Our Story</a></li>
+                                <li><a href="#" class="hover:text-brand-light transition">Careers</a></li>
+                                <li><a href="#" class="hover:text-brand-light transition">Sustainability</a></li>
+                                <li><a href="#" class="hover:text-brand-light transition">Press</a></li>
                             </ul>
                         </div>
                         <div>
                             <h4 class="font-semibold text-sm tracking-wider uppercase text-gray-500 mb-4">Newsletter</h4>
                             <p class="text-xs text-gray-400 mb-4">Get updates on new drops & offers.</p>
-                            <form class="flex border border-gray-700 rounded overflow-hidden focus-within:border-primary transition">
+                            <form class="flex border border-gray-700 rounded overflow-hidden focus-within:border-brand transition">
                                 <input type="email" placeholder="Enter your email" class="bg-transparent border-none text-sm px-4 py-2 w-full focus:ring-0 text-white placeholder-gray-500">
-                                <button type="submit" class="px-4 text-primary hover:text-white transition">→</button>
+                                <button type="submit" class="px-4 text-brand hover:text-white transition">→</button>
                             </form>
                         </div>
                     </div>

@@ -11,7 +11,7 @@ class ProdutoController extends Controller
     public function index(Request $request)
     {
         $produtos = Produto::ativo()
-            ->with(['categoria', 'imagemPrincipal'])
+            ->with(['categoria', 'imagemPrincipal', 'avaliacoesAprovadas'])
             ->filtrar($request->categoria, $request->q)
             ->paginate(12)
             ->withQueryString();

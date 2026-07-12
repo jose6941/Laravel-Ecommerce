@@ -40,7 +40,7 @@
                             <!-- Image -->
                             <div class="h-24 w-24 shrink-0 rounded-2xl bg-[#F5F5F5] overflow-hidden">
                                 @if ($item->produto?->imagemPrincipal)
-                                    <img src="{{ $item->produto->imagemPrincipal->url }}" alt="{{ $item->produto->nome }}" class="h-full w-full object-cover mix-blend-multiply">
+                                    <x-img-skeleton src="{{ $item->produto->imagemPrincipal->url }}" alt="{{ $item->produto->nome }}" wrapperClass="h-full w-full" class="h-full w-full object-cover" />
                                 @endif
                             </div>
 
@@ -107,11 +107,11 @@
                 </div>
                 
                 @auth
-                    <a href="{{ route('checkout.index') }}" class="flex-1 bg-black text-white rounded-full py-4 text-center font-semibold text-sm hover:bg-gray-800 transition shadow-lg shadow-gray-400/20">
+                    <a href="{{ route('checkout.index') }}" class="flex-1 bg-brand text-white rounded-full py-4 text-center font-bold text-sm hover:bg-brand-dark transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-0.5">
                         Checkout ({{ $carrinho->itens->count() }}) - R$ {{ number_format($carrinho->itens->sum(fn ($i) => $i->preco_unitario * $i->quantidade), 2, ',', '.') }}
                     </a>
                 @else
-                    <a href="{{ route('login') }}" class="flex-1 bg-black text-white rounded-full py-4 text-center font-semibold text-sm hover:bg-gray-800 transition shadow-lg shadow-gray-400/20">
+                    <a href="{{ route('login') }}" class="flex-1 bg-brand text-white rounded-full py-4 text-center font-bold text-sm hover:bg-brand-dark transition-all duration-300 shadow-lg hover:shadow-xl">
                         Login para Checkout
                     </a>
                 @endauth

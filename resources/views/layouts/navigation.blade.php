@@ -52,10 +52,10 @@
                     </div>
                 @else
                     <div class="hidden md:flex items-center gap-2">
-                        <a href="{{ route('register') }}" class="inline-flex items-center justify-center px-5 py-2.5 text-xs font-bold tracking-[0.15em] uppercase text-white bg-[#1a1a1a] hover:bg-gray-800 hover:shadow-lg transition-all duration-300 rounded-full">
+                        <a href="{{ route('register') }}" class="inline-flex items-center justify-center px-5 py-2.5 text-xs font-bold tracking-[0.15em] uppercase text-white bg-brand hover:bg-brand-dark hover:shadow-lg transition-all duration-300 rounded-full">
                             CADASTRO
                         </a>
-                        <a href="{{ route('login') }}" class="inline-flex items-center justify-center px-5 py-2.5 text-xs font-bold tracking-[0.15em] uppercase text-[#1a1a1a] hover:bg-[#1a1a1a] hover:text-white hover:shadow-lg transition-all duration-300 border-2 border-[#1a1a1a] rounded-full">
+                        <a href="{{ route('login') }}" class="inline-flex items-center justify-center px-5 py-2.5 text-xs font-bold tracking-[0.15em] uppercase text-brand border-2 border-brand hover:bg-brand hover:text-white hover:shadow-lg transition-all duration-300 rounded-full">
                             LOGIN
                         </a>
                     </div>

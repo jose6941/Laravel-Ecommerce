@@ -356,7 +356,7 @@ class ProductSeeder extends Seeder
             $caminhos = [];
 
             foreach ($data['photos'] as $i => $photo) {
-                $imageUrl = $photo['src']['original'] ?? $photo['src']['large'] ?? null;
+                $imageUrl = $photo['src']['large'] ?? $photo['src']['medium'] ?? $photo['src']['original'] ?? null;
 
                 if (! $imageUrl) {
                     continue;
