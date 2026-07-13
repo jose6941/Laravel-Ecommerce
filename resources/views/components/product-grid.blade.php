@@ -8,7 +8,7 @@
                 <p class="text-gray-500 text-sm mt-1">Tente buscar por outro termo ou remover os filtros aplicados.</p>
             </div>
         @else
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 gsap-products-grid">
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 lg:gap-5 gsap-products-grid">
                 @foreach ($produtos as $produto)
                     <div class="gsap-product-card">
                         <x-product-card :produto="$produto" />

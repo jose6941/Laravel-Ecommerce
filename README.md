@@ -12,40 +12,46 @@ Este é um projeto completo de Ecommerce desenvolvido em Laravel, criado com foc
 
 ---
 
-## Como Configurar e Rodar o Projeto
+## Como Configurar e Rodar o Projeto (Docker/Sail)
 
-Siga os passos abaixo para iniciar o projeto localmente:
+Para rodar o projeto localmente usando Docker Desktop e WSL (Windows Subsystem for Linux), siga os passos abaixo:
 
-1. **Instale as dependências do PHP:**
-   ```bash
-   composer install
-   ```
+1. **Clone o repositório e acesse a pasta do projeto no seu terminal WSL.**
 
-2. **Instale as dependências do Node (Frontend):**
-   ```bash
-   npm install
-   npm run build
-   ```
-
-3. **Configure o ambiente:**
-   Copie o arquivo `.env.example` para `.env` e configure os dados do seu banco de dados local.
+2. **Copie o arquivo de configuração de ambiente:**
    ```bash
    cp .env.example .env
    ```
-   *Dica: Caso use SQLite, apenas crie o arquivo `database/database.sqlite` e configure o `DB_CONNECTION=sqlite` no `.env`.*
 
-4. **Gere a chave da aplicação e rode as migrações:**
-   Isso criará todas as tabelas no seu banco de dados de uma vez.
+3. **Instale as dependências do Composer usando um container temporário:**
    ```bash
-   php artisan key:generate
-   php artisan migrate
+   docker run --rm \
+       -u "$(id -u):$(id -g)" \
+       -v "$(pwd):/var/www/html" \
+       -w /var/www/html \
+       laravelsail/php82-composer:latest \
+       composer install --ignore-platform-reqs
    ```
 
-5. **Inicie o Servidor Local:**
+4. **Inicie os containers do Laravel Sail:**
    ```bash
-   php artisan serve
+   ./vendor/bin/sail up -d
    ```
-   Acesse no navegador: `http://localhost:8000`
+
+5. **Gere a chave da aplicação e rode as migrações:**
+   ```bash
+   ./vendor/bin/sail artisan key:generate
+   ./vendor/bin/sail artisan migrate
+   ```
+
+6. **Instale as dependências do Frontend (Node):**
+   ```bash
+   ./vendor/bin/sail npm install
+   ./vendor/bin/sail npm run build
+   ```
+
+Acesse no navegador: `http://localhost`
+Para parar os containers, use: `./vendor/bin/sail down`
 
 ---
 

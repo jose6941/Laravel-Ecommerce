@@ -324,7 +324,7 @@
 
             // 0. Tipografia gigante de fundo entra com fade + zoom lento (efeito poster)
             bannerTl.from('.gsap-bg-text', {
-                opacity: 0,
+                autoAlpha: 0,
                 scale: 1.08,
                 duration: 2.2,
                 ease: 'power2.out'
@@ -333,7 +333,7 @@
             // 1. Texto entra com stagger lento e suave (tagline, título, subtítulo, botão, trust)
             bannerTl.from('.gsap-banner-item', {
                 y: 55,
-                opacity: 0,
+                autoAlpha: 0,
                 duration: 1.2,
                 stagger: 0.2,
                 ease: 'power3.out'
@@ -344,7 +344,7 @@
                 x: 110,
                 scale: 0.78,
                 rotationZ: 10,
-                opacity: 0,
+                autoAlpha: 0,
                 filter: 'blur(20px)',
                 duration: 1.8,
                 ease: 'power3.out'
@@ -352,7 +352,7 @@
 
             // 3. Scroll indicator fade in
             bannerTl.from('.gsap-scroll-indicator', {
-                opacity: 0,
+                autoAlpha: 0,
                 y: 10,
                 duration: 0.8
             }, '-=0.3');
@@ -440,13 +440,14 @@
                         x: gsap.utils.random(-maxX, maxX, 1),
                         y: gsap.utils.random(-maxY, maxY, 1),
                         rotation: gsap.utils.random(-15, 15, 1),
-                        opacity: gsap.utils.random(0.04, 0.25, 0.01),
+                        autoAlpha: gsap.utils.random(0.04, 0.25, 0.01),
                         duration: gsap.utils.random(10, 20, 0.1),
                         delay: gsap.utils.random(1, 5, 0.1),
                         ease: 'sine.inOut',
                         yoyo: true,
                         repeat: -1,
-                        repeatDelay: gsap.utils.random(0.5, 2, 0.1)
+                        repeatDelay: gsap.utils.random(0.5, 2, 0.1),
+                        overwrite: 'auto'
                     });
                 });
             }
@@ -462,7 +463,7 @@
 
             // 0. Background text "SOUND" fade + scale
             foneTl.from('.gsap-fone-bg-text', {
-                opacity: 0,
+                autoAlpha: 0,
                 scale: 1.1,
                 duration: 2.5,
                 ease: 'power2.out'
@@ -471,7 +472,7 @@
             // 1. Texto entra com stagger mais longo e suave
             foneTl.from('.gsap-airpod-item', {
                 y: 70,
-                opacity: 0,
+                autoAlpha: 0,
                 duration: 1.4,
                 stagger: 0.25,
                 ease: 'power4.out'
@@ -482,7 +483,7 @@
                 x: 150,
                 scale: 0.7,
                 rotationZ: 12,
-                opacity: 0,
+                autoAlpha: 0,
                 filter: 'blur(30px)',
                 duration: 2.2,
                 ease: 'expo.out'
@@ -490,7 +491,7 @@
 
             // 3. Scroll indicator
             foneTl.from('.gsap-airpod-scroll', {
-                opacity: 0,
+                autoAlpha: 0,
                 y: 15,
                 duration: 1.0
             }, '-=0.5');
@@ -579,13 +580,14 @@
                         x: gsap.utils.random(-maxX, maxX, 1),
                         y: gsap.utils.random(-maxY, maxY, 1),
                         rotation: gsap.utils.random(-20, 20, 1),
-                        opacity: gsap.utils.random(0.02, 0.2, 0.01),
+                        autoAlpha: gsap.utils.random(0.02, 0.2, 0.01),
                         duration: gsap.utils.random(12, 25, 0.1),
                         delay: gsap.utils.random(0, 5, 0.1),
                         ease: 'sine.inOut',
                         yoyo: true,
                         repeat: -1,
-                        repeatDelay: gsap.utils.random(0.5, 3, 0.1)
+                        repeatDelay: gsap.utils.random(0.5, 3, 0.1),
+                        overwrite: 'auto'
                     });
                 }
             })();
@@ -602,8 +604,10 @@
                             toggleActions: 'play none none none'
                         },
                         y: 40,
+                        autoAlpha: 0,
                         duration: 1.0,
-                        ease: 'power3.out'
+                        ease: 'power4.out',
+                        overwrite: 'auto'
                     });
                 });
 
@@ -611,7 +615,7 @@
                 const categoryCards = document.querySelectorAll('.gsap-category-card');
                 const categoryGrid = document.querySelector('.gsap-category-grid');
                 if (categoryCards.length && categoryGrid) {
-                    gsap.set(categoryCards, { opacity: 0, y: 60, scale: 0.95 });
+                    gsap.set(categoryCards, { autoAlpha: 0, y: 60, scale: 0.95 });
 
                     gsap.to(categoryCards, {
                         scrollTrigger: {
@@ -620,12 +624,13 @@
                             once: true,
                         },
                         y: 0,
-                        opacity: 1,
+                        autoAlpha: 1,
                         scale: 1,
                         duration: 1.0,
                         stagger: { each: 0.15, from: 'start' },
-                        ease: 'power3.out',
-                        clearProps: 'all'
+                        ease: 'expo.out',
+                        clearProps: 'all',
+                        overwrite: 'auto'
                     });
                 }
 
@@ -649,7 +654,7 @@
                 if (productsGrid) {
                     const productCards = document.querySelectorAll('.gsap-product-card');
 
-                    gsap.set(productCards, { opacity: 0, y: 80, scale: 0.92 });
+                    gsap.set(productCards, { autoAlpha: 0, y: 80, scale: 0.92 });
 
                     gsap.to(productCards, {
                         scrollTrigger: {
@@ -658,12 +663,13 @@
                             once: true,
                         },
                         y: 0,
-                        opacity: 1,
+                        autoAlpha: 1,
                         scale: 1,
                         duration: 1.1,
                         stagger: { each: 0.12, from: 'start' },
-                        ease: 'power3.out',
-                        clearProps: 'all'
+                        ease: 'expo.out',
+                        clearProps: 'all',
+                        overwrite: 'auto'
                     });
                 }
             }

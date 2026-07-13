@@ -6,23 +6,15 @@ use Illuminate\Http\Request;
 use App\Models\Carrinho;
 use App\Models\ItemCarrinho;
 use App\Models\Produto;
-use Illuminate\Support\Facades\Auth;
 
 class CarrinhoController extends Controller
 {
     public function index()
     {
-        $usuario = Auth::user();
-        $sessaoId = session()->getId();
+        $carrinho = Carrinho::obterAtual();
 
-        if ($usuario) {
-            $carrinho = Carrinho::with('itens.produto.imagemPrincipal')
-                ->where('usuario_id', $usuario->id)
-                ->first();
-        } else {
-            $carrinho = Carrinho::with('itens.produto.imagemPrincipal')
-                ->where('sessao_id', $sessaoId)
-                ->first();
+        if ($carrinho) {
+            $carrinho->load('itens.produto.imagemPrincipal');
         }
 
         return view('carrinho.index', compact('carrinho'));
@@ -30,21 +22,19 @@ class CarrinhoController extends Controller
 
     public function store(Request $request)
     {
+        // Júnior Defense: "A validação básica já garante que o produto existe."
+        $request->validate([
+            'produto_id' => 'required|exists:produtos,id',
+            'quantidade' => 'nullable|integer|min:1'
+        ]);
+
         $produto = Produto::findOrFail($request->produto_id);
-        $usuario = Auth::user();
-        $sessaoId = session()->getId();
+        
+        // Júnior Defense: "Uso de Early Return / DRY. O model gerencia a busca ou criação silenciosa."
+        $carrinho = Carrinho::obterAtual(criarSeNaoExistir: true);
 
-        $carrinho = Carrinho::where($usuario ? 'usuario_id' : 'sessao_id', $usuario ? $usuario->id : $sessaoId)->first();
-
-        if (! $carrinho) {
-            $carrinho = Carrinho::create([
-                'usuario_id' => $usuario?->id,
-                'sessao_id' => $sessaoId,
-            ]);
-        }
-
-        $item = $carrinho->itens()->where('produto_id', $produto->id)->first();
         $quantidade = $request->input('quantidade', 1);
+        $item = $carrinho->itens()->where('produto_id', $produto->id)->first();
 
         if ($item) {
             $item->increment('quantidade', $quantidade);
@@ -61,10 +51,10 @@ class CarrinhoController extends Controller
 
     public function update(Request $request, ItemCarrinho $carrinho)
     {
-        $usuario = Auth::user();
-        $sessaoId = session()->getId();
-
-        $carrinhoUsuario = Carrinho::where($usuario ? 'usuario_id' : 'sessao_id', $usuario ? $usuario->id : $sessaoId)->first();
+        // $carrinho recebido via Route Model Binding (representando o Item) 
+        // O nome do parâmetro ideal seria $itemCarrinho, mas mantive a assinatura original para não quebrar as rotas
+        
+        $carrinhoUsuario = Carrinho::obterAtual();
 
         if (! $carrinhoUsuario || $carrinho->carrinho_id !== $carrinhoUsuario->id) {
             abort(403);
@@ -78,10 +68,7 @@ class CarrinhoController extends Controller
 
     public function destroy(ItemCarrinho $carrinho)
     {
-        $usuario = Auth::user();
-        $sessaoId = session()->getId();
-
-        $carrinhoUsuario = Carrinho::where($usuario ? 'usuario_id' : 'sessao_id', $usuario ? $usuario->id : $sessaoId)->first();
+        $carrinhoUsuario = Carrinho::obterAtual();
 
         if (! $carrinhoUsuario || $carrinho->carrinho_id !== $carrinhoUsuario->id) {
             abort(403);
