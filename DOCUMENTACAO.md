@@ -1,12 +1,10 @@
-# Guia de Arquitetura e Engenharia: E-commerce Laravel
+# Arquitetura E-commerce Laravel
 
 Este documento contém as representações visuais e arquiteturais do nosso sistema de E-commerce, modelado em Laravel. Ele foi criado como um material de apoio definitivo para que desenvolvedores (júniores e plenos) possam entender e explicar o ecossistema com a propriedade de um Arquiteto de Soluções.
 
 ---
 
-## 1. Fluxo de Valor (A Jornada do Cliente)
-
-Este diagrama demonstra a jornada do cliente e como as funcionalidades que desenvolvemos impactam diretamente o funil de vendas do negócio.
+## 1. Fluxograma
 
 ```mermaid
 graph TD
@@ -32,70 +30,11 @@ graph TD
 
 > *"Neste fluxo de valor, modelamos a jornada desde a **Descoberta do Produto** até a **Persistência do Pedido**. Utilizamos os **Middlewares de Autenticação** do Laravel para barrar requisições não autorizadas, protegendo os dados sensíveis. A persistência do pedido é atômica no banco de dados e ações demoradas ocorrem em Filas."*
 
-### Contexto em Código: Etapas do Fluxo
-
-**1. Descoberta do Produto:**
-```php
-// Carregamento de produtos com Eager Loading
-$produtos = Produto::with('categoria')
-    ->where('ativo', true)
-    ->where('estoque', '>', 0)
-    ->paginate(12);
-
-return view('produtos.index', compact('produtos'));
-```
-
-**2. Adição ao Carrinho e Controle de Sessão:**
-```php
-// Resolve se é usuário logado ou visitante (sessão)
-$carrinho = Carrinho::firstOrCreate([
-    'usuario_id' => Auth::id(), 
-    'sessao_id'  => Auth::check() ? null : session()->getId()
-]);
-
-// updateOrCreate evita duplicidade, garantindo a unique key no BD
-$carrinho->itens()->updateOrCreate(
-    ['produto_id' => $request->produto_id],
-    [
-        'quantidade' => DB::raw("quantidade + {$request->quantidade}"),
-        'preco_unitario' => $produto->preco 
-    ]
-);
-```
-
-**3. Validação e Persistência do Pedido (Transação Atômica):**
-```php
-// CheckoutController.php
-// DB::transaction para garantir que se algo falhar, NENHUM dado é salvo (Rollback).
-DB::transaction(function () use ($carrinho, $request) {
-    $pedido = Pedido::create([
-        'uuid' => Str::uuid(),
-        'usuario_id' => Auth::id(),
-        'status' => 'processando',
-        'subtotal' => $carrinho->calcularSubtotal(),
-        'total' => $carrinho->calcularTotal(),
-        'endereco_entrega' => json_encode($request->endereco_snapshot)
-    ]);
-    
-    foreach ($carrinho->itens as $item) {
-        $pedido->itens()->create([
-            'produto_id' => $item->produto_id,
-            'nome_produto' => $item->produto->nome,
-            'quantidade' => $item->quantidade,
-            'preco_unitario' => $item->preco_unitario, 
-            'total' => $item->quantidade * $item->preco_unitario
-        ]);
-    }
-    
-    $carrinho->itens()->delete();
-});
-```
-
 ---
 
-## 2. Requisitos e Casos de Uso (Visão Prática)
+## 2. Requisitos e Casos de Uso
 
-Em vez de focar apenas no ciclo de vida interno, esta seção mapeia de forma prática **o que** o sistema faz e **quem** tem a permissão de fazê-lo. O Diagrama de Casos de Uso abaixo ilustra os atores (humanos e sistemas) e as fronteiras dentro do ecossistema.
+O Diagrama de Casos de Uso abaixo ilustra os atores (humanos e sistemas) e as fronteiras dentro do ecossistema.
 
 ```mermaid
 flowchart LR
@@ -137,47 +76,139 @@ flowchart LR
     UC4 --- Pay
 ```
 
-> *"O Diagrama de Casos de Uso nos ajuda a entender as restrições e permissões do negócio. Observe que as funcionalidades de **Descoberta** e **Carrinho** (UC1, UC2) estão abertas a Visitantes, maximizando nossas taxas de conversão inicial. O funil se fecha no **Checkout** (UC4), exigindo Autenticação para que o Cliente converse indiretamente com o Gateway de Pagamento, garantindo rastreabilidade. O Administrador possui uma fronteira totalmente isolada para gestão."*
+> *"O Diagrama de Casos de Uso nos ajuda a entender as restrições e permissões do negócio. Observe que as funcionalidades de **Descoberta** e **Carrinho** estão abertas a Visitantes, maximizando nossas taxas de conversão inicial. O funil se fecha no **Checkout**, exigindo Autenticação para que o Cliente converse indiretamente com o Gateway de Pagamento, garantindo rastreabilidade. O Administrador possui uma fronteira totalmente isolada para gestão."*
 
-### Contexto em Código: Implementando as Permissões e Requisitos
+### Contexto em Código: Etapas do Fluxo
 
-A implementação prática deste diagrama no Laravel exige controle rígido de acesso através de **Middlewares** e inteligência no armazenamento temporário (Sessão).
+**1. Descoberta do Produto:**
+```php
+// app/Http/Controllers/ProdutoController.php
+public function index()
+{
+    // O 'with' chama o relacionamento definido no Model Produto
+    $produtos = Produto::with('categoria')
+        ->where('ativo', true)
+        ->paginate(12);
 
-**1. Carrinho Flexível (Atores: Visitante e Cliente)**
-O sistema deve permitir que Visitantes anônimos criem carrinhos, que posteriomente serão transferidos quando logarem. Resolvemos isso atrelando o carrinho ao `sessao_id` ou ao `usuario_id`:
+    return view('produtos.index', compact('produtos'));
+}
+```
+
+**2. Adição ao Carrinho**
 ```php
 // app/Http/Controllers/CarrinhoController.php
 public function store(Request $request)
 {
+    // Tenta encontrar um carrinho com o ID do usuário ou o ID da Sessão local
     $carrinho = Carrinho::firstOrCreate([
         'usuario_id' => Auth::id(), 
-        'sessao_id'  => Auth::check() ? null : session()->getId() 
+        'sessao_id'  => Auth::check() ? null : session()->getId()
     ]);
 
-    $carrinho->itens()->create(['produto_id' => $request->produto_id]);
+    // Cria o item ou apenas atualiza a quantidade 
+    $carrinho->itens()->updateOrCreate(
+        ['produto_id' => $request->produto_id],
+        [
+            // Se o item já existir, o banco entende e soma a quantidade!
+            'quantidade' => DB::raw("quantidade + {$request->quantidade}"),
+        ]
+    );
+
+    return back()->with('sucesso', 'Produto adicionado ao seu carrinho!');
 }
 ```
 
-**2. A Fronteira do Checkout (Casos UC3 e UC4)**
-O Checkout exige uma transição de status (Visitante para Cliente Logado). Protegemos as rotas de conversão final e acompanhamento de pedidos utilizando o middleware nativo `auth`.
+**3. Validação e Persistência do Pedido (Transação Atômica):**
 ```php
+// app/Http/Controllers/CheckoutController.php
+class CheckoutController extends Controller
+{
+    // Exibe a tela de finalização de compra
+    public function index(Request $request)
+    {
+        $carrinho = Carrinho::where('usuario_id',$request->user()->id)->with('itens.produto')->first();
 
-Route::resource('carrinho', CarrinhoController::class);
-Route::middleware('auth')->group(function () {
-    Route::resource('checkout', CheckoutController::class)->only(['index', 'store']);
-    Route::resource('pedidos', PedidoController::class)->only(['show']);
-});
-```
+        if (! $carrinho || $carrinho->itens->isEmpty()) {
+            return redirect()->route('carrinho.index')->with('error', 'Seu carrinho está vazio.');
+        }
 
-**3. Isolamento Administrativo e de Catálogo (Caso UC7)**
-O gerenciamento de estoque deve ser completamente blindado contra explorações. Utilizamos um middleware personalizado (`IsAdmin`) em cadeia para barrar até mesmo Clientes logados que não sejam administradores.
-```php
+        $enderecos = Endereco::where('usuario_id',$request->user()->id)->get();
+        return view('checkout.index', compact('carrinho', 'enderecos'));
+    }
 
-Route::middleware(['auth', \App\Http\Middleware\IsAdmin::class])
-     ->prefix('admin')
-     ->group(function () {
-         Route::resource('produtos', AdminProdutoController::class);
-});
+    // Processa o fechamento do pedido
+    public function store(Request $request)
+    {
+        // Validação local dos dados de entrega e pagamento
+        $request->validate([
+            'endereco_id' => 'required|exists:enderecos,id',
+            'metodo_pagamento' => 'required|string',
+            'codigo_cupom' => 'nullable|string'
+        ]);
+
+        $usuario = $request->user();
+        $carrinho = Carrinho::where('usuario_id',$usuario->id)->with('itens.produto')->first();
+
+        if (! $carrinho \vert{}\vert{}$carrinho->itens->isEmpty()) {
+            return back()->with('error', 'O carrinho está vazio.');
+        }
+
+        $endereco = Endereco::where('usuario_id', $usuario->id)->findOrFail($request->endereco_id);
+
+        try {
+            // Execução da Transação (Garante consistência total)
+            $pedido = DB::transaction(function () use ($usuario,$carrinho, $endereco,$request) {
+                $subtotal = $carrinho->itens->sum(fn ($item) =>$item->preco_unitario * $item->quantidade);
+                $desconto = 0;
+                $cupom = null;
+
+                // Validação e cálculo do cupom de desconto
+                if ($request->codigo_cupom) {
+                    $cupom = Cupom::where('codigo',$request->codigo_cupom)->first();
+
+                    if (! $cupom || !$cupom->valido()) {
+                        throw new \Exception('Cupom inválido ou expirado.');
+                    }
+
+                    $desconto = $cupom->calcularDesconto($subtotal);
+                }
+
+                // Criação do registro pedido com o Snapshot do endereço
+                $pedido = Pedido::create([
+                    'usuario_id' => $usuario->id,
+                    'cupom_id' => $cupom?->id,
+                    'subtotal' => $subtotal,
+                    'desconto' => $desconto,
+                    'frete' => 0,
+                    'total' => $subtotal -$desconto,
+                    'metodo_pagamento' => $request->metodo_pagamento,
+                    'endereco_entrega' => $endereco->only(['rua', 'numero', 'complemento', 'bairro', 'cidade', 'estado', 'cep']),
+                ]);
+
+                // Criação dos itens do pedido com o "Snapshot" dos preços e baixa no estoque
+                foreach ($carrinho->itens as $item) {$pedido->itens()->create([
+                        'produto_id' => $item->produto_id,
+                        'nome_produto' => $item->produto->nome,
+                        'preco_unitario' => $item->preco_unitario, // Histórico de preço congelado aqui
+                        'quantidade' => $item->quantidade,
+                        'total' => $item->preco_unitario * $item->quantidade,
+                    ]);
+
+                    $item->produto()->decrement('estoque',$item->quantidade);
+                }
+
+                $carrinho->itens()->delete();
+
+                return $pedido;
+            });
+        } catch (\Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
+
+        return redirect()->route('pedidos.show', $pedido)->with('success', 'Pedido realizado!');
+    }
+}
+
 ```
 
 ---
@@ -348,13 +379,9 @@ Ela garante que apenas as pessoas certas acessem áreas sensíveis, como o fecha
 
 ### Contexto em Código: Rotas, Middlewares e Controllers
 
-O ecossistema de segurança é composto por três peças principais trabalhando em sincronia: o arquivo de Rotas (`web.php`), os **Middlewares** (os seguranças) e os **Controllers**, que já recebem a requisição confiável.
+**1. A Barreira das Rotas**
 
-**1. A Barreira das Rotas (Onde o segurança fica)**
-
-No Laravel, nós não precisamos colocar lógica de segurança dentro de cada Controller. Nós "envelopamos" as rotas com middlewares. Se o usuário não tiver permissão, ele é barrado *antes* mesmo de chegar ao Controller.
-
-Repare que a navegação da loja (home, produtos e até o **carrinho**) é pública. O login só é exigido a partir do checkout. Já a área administrativa fica aninhada dentro do grupo autenticado e ganha uma camada extra: o middleware `IsAdmin`.
+O login só é exigido a partir do checkout. Já a área administrativa fica aninhada dentro do grupo autenticado e ganha uma camada extra: o middleware `IsAdmin`.
 
 ```php
 // routes/web.php
@@ -395,7 +422,7 @@ Route::middleware('auth')->group(function () {
 });
 ```
 
-**2. O Middleware Personalizado (Checando o Crachá)**
+**2. O Middleware Personalizado**
 
 O Laravel já traz o middleware `auth` pronto para verificar se a pessoa está logada. Mas para a área administrativa da loja, criamos um guarda próprio (`IsAdmin`), que consulta o método `isAdmin()` do próprio usuário.
 
@@ -419,84 +446,3 @@ class IsAdmin
     }
 }
 ```
-
-**3. Integração com Controllers (Recuperando a Identidade)**
-
-Uma vez que o middleware validou o acesso, o Controller trabalha com a certeza absoluta de que a requisição é confiável e recupera a identidade do usuário direto da requisição (`$request->user()`).
-
-No `CheckoutController`, essa identidade é o fio condutor de toda a operação: ela localiza o carrinho, garante que o endereço pertence a quem está comprando e amarra o pedido ao dono. Todo o processo roda dentro de uma transação (`DB::transaction`) — se o cupom for inválido ou algo falhar no meio do caminho, nada é gravado.
-
-```php
-// app/Http/Controllers/CheckoutController.php
-
-public function store(Request $request)
-{
-    $request->validate([
-        'endereco_id' => 'required|exists:enderecos,id',
-        'metodo_pagamento' => 'required|string',
-        'codigo_cupom' => 'nullable|string',
-    ]);
-
-    $usuario = $request->user();
-    $carrinho = Carrinho::where('usuario_id', $usuario->id)->with('itens.produto')->first();
-
-    if (! $carrinho || $carrinho->itens->isEmpty()) {
-        return back()->with('error', 'O carrinho está vazio.');
-    }
-
-    // Só encontra o endereço se ele pertencer ao usuário logado
-    $endereco = Endereco::where('usuario_id', $usuario->id)->findOrFail($request->endereco_id);
-
-    try {
-        $pedido = DB::transaction(function () use ($usuario, $carrinho, $endereco, $request) {
-            $subtotal = $carrinho->itens->sum(fn ($item) => $item->preco_unitario * $item->quantidade);
-
-            $desconto = 0;
-            $cupom = null;
-
-            if ($request->codigo_cupom) {
-                $cupom = Cupom::where('codigo', $request->codigo_cupom)->first();
-
-                if (! $cupom || ! $cupom->valido()) {
-                    throw new \Exception('Cupom inválido ou expirado.');
-                }
-
-                $desconto = $cupom->calcularDesconto($subtotal);
-            }
-
-            $pedido = Pedido::create([
-                'usuario_id' => $usuario->id,
-                'cupom_id' => $cupom?->id,
-                'subtotal' => $subtotal,
-                'desconto' => $desconto,
-                'frete' => 0,
-                'total' => $subtotal - $desconto,
-                'metodo_pagamento' => $request->metodo_pagamento,
-                'endereco_entrega' => $endereco->only(['rua', 'numero', 'complemento', 'bairro', 'cidade', 'estado', 'cep']),
-            ]);
-
-            foreach ($carrinho->itens as $item) {
-                $pedido->itens()->create([
-                    'produto_id' => $item->produto_id,
-                    'nome_produto' => $item->produto->nome,
-                    'preco_unitario' => $item->preco_unitario,
-                    'quantidade' => $item->quantidade,
-                    'total' => $item->preco_unitario * $item->quantidade,
-                ]);
-
-                $item->produto()->decrement('estoque', $item->quantidade);
-            }
-
-            $carrinho->itens()->delete();
-
-            return $pedido;
-        });
-    } catch (\Exception $e) {
-        return back()->with('error', $e->getMessage());
-    }
-
-    return redirect()->route('pedidos.show', $pedido)->with('success', 'Pedido realizado!');
-}
-```
-
-> **Resumo do fluxo:** `auth` garante *quem* é o usuário → `IsAdmin` garante *o que* ele pode fazer → o Controller usa `$request->user()` para amarrar cada ação (pedido, endereço, avaliação) ao dono correto, sem precisar confiar em nenhum dado vindo do formulário.
