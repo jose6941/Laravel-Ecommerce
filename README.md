@@ -28,7 +28,7 @@ Para contornar isso, adicione ou modifique a variável `FORWARD_DB_PORT` no `.en
 DB_CONNECTION=mysql
 DB_HOST=mysql
 DB_PORT=3306
-DB_DATABASE=store_commerce
+DB_DATABASE=ecommerce
 DB_USERNAME=sail
 DB_PASSWORD=password
 
@@ -43,6 +43,13 @@ Suba a infraestrutura completa de containers e realize o bootstrap do Laravel:
 ./vendor/bin/sail artisan key:generate
 ./vendor/bin/sail artisan migrate:fresh --seed
 ./vendor/bin/sail artisan storage:link
+```
+
+**Caso der erro, elimine o container com falha e suba dnovo**
+Garanta que o diretório do WSL esteja no projeto, caso contrário não vai dar certo
+```bash
+./vendor/bin/sail down --volumes
+./vendor/bin/sail up -d
 ```
 
 **5. Compilação Front-end Moderno (HMR Ativo):**
