@@ -344,35 +344,60 @@ Schema::create('itens_pedido', function (Blueprint $table) {
 
 Ela garante que apenas as pessoas certas acessem áreas sensíveis, como o fechamento da compra (Checkout) e o painel de gerenciamento (Admin).
 
-> O visitante pode olhar os Produtos e encher o carrinho livremente. Mas, na hora de passar no caixa (Checkout), precisa fazer login. Se for um funcionário (Admin), ele ganha uma chave mestra para acessar a sala do estoque. Tudo isso é gerenciado pelos **Middlewares**, que filtram quem passa por qual porta de forma invisível e segura."
+> O visitante pode olhar os Produtos e encher o carrinho livremente. Mas, na hora de passar no caixa (Checkout), precisa fazer login. Se for um funcionário (Admin), ele ganha uma chave mestra para acessar a sala do estoque. Tudo isso é gerenciado pelos **Middlewares**, que filtram quem passa por qual porta de forma invisível e segura.
 
 ### Contexto em Código: Rotas, Middlewares e Controllers
 
-O ecossistema de segurança é composto por três peças principais trabalhando em sincronia: o arquivo de Rotas (`web.php`), os **Middlewares** (os seguranças) e os **Controllers** de Autenticação.
+O ecossistema de segurança é composto por três peças principais trabalhando em sincronia: o arquivo de Rotas (`web.php`), os **Middlewares** (os seguranças) e os **Controllers**, que já recebem a requisição confiável.
 
 **1. A Barreira das Rotas (Onde o segurança fica)**
+
 No Laravel, nós não precisamos colocar lógica de segurança dentro de cada Controller. Nós "envelopamos" as rotas com middlewares. Se o usuário não tiver permissão, ele é barrado *antes* mesmo de chegar ao Controller.
+
+Repare que a navegação da loja (home, produtos e até o **carrinho**) é pública. O login só é exigido a partir do checkout. Já a área administrativa fica aninhada dentro do grupo autenticado e ganha uma camada extra: o middleware `IsAdmin`.
 
 ```php
 // routes/web.php
 
-Route::get('/', [InicioController::class, 'index']);
-Route::get('/produtos', [ProdutoController::class, 'index']);
+// Área pública
+Route::get('/', [InicioController::class, 'index'])->name('home');
+Route::resource('produtos', ProdutoController::class)->only(['index', 'show']);
+Route::resource('carrinho', CarrinhoController::class)->only(['index', 'store', 'update', 'destroy']);
+
+// Avaliar um produto exige login, mesmo estando na área pública
+Route::resource('produtos.avaliacoes', AvaliacaoController::class)->only(['store'])
+    ->middleware('auth');
 
 // Apenas Usuários Logados
 Route::middleware('auth')->group(function () {
-    Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout');
-    Route::get('/meus-pedidos', [PedidoController::class, 'index'])->name('pedidos');
-});
+    Route::get('dashboard', function () {
+        return Auth::user()->isAdmin()
+            ? redirect()->route('admin.dashboard')
+            : view('dashboard');
+    })->name('dashboard');
 
-// Apenas Administradores
-Route::middleware(['auth', \App\Http\Middleware\IsAdmin::class])->group(function () {
-    Route::resource('/admin/produtos', AdminProdutoController::class);
+    Route::resource('checkout', CheckoutController::class)->only(['index', 'store']);
+    Route::resource('pedidos', PedidoController::class)->only(['show']);
+    Route::resource('enderecos', EnderecoController::class)->only(['store', 'destroy']);
+
+    Route::get('/perfil', [PerfilController::class, 'edit'])->name('profile.edit');
+    Route::patch('/perfil', [PerfilController::class, 'update'])->name('profile.update');
+    Route::delete('/perfil', [PerfilController::class, 'destroy'])->name('profile.destroy');
+
+    // Apenas Administradores (auth + IsAdmin)
+    Route::middleware([\App\Http\Middleware\IsAdmin::class])
+        ->prefix('admin')
+        ->name('admin.')
+        ->group(function () {
+            Route::get('/', [PainelController::class, 'index'])->name('dashboard');
+            Route::resource('produtos', AdminProdutoController::class)->only(['index', 'edit', 'update']);
+        });
 });
 ```
 
 **2. O Middleware Personalizado (Checando o Crachá)**
-O Laravel já traz o middleware `auth` pronto para verificar se a pessoa está logada. Mas para a área administrativa da loja, criamos um guarda próprio (`IsAdmin`).
+
+O Laravel já traz o middleware `auth` pronto para verificar se a pessoa está logada. Mas para a área administrativa da loja, criamos um guarda próprio (`IsAdmin`), que consulta o método `isAdmin()` do próprio usuário.
 
 ```php
 // app/Http/Middleware/IsAdmin.php
@@ -380,42 +405,98 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Symfony\Component\HttpFoundation\Response;
 
 class IsAdmin
 {
-    public function handle(Request $request, Closure $next)
+    public function handle(Request $request, Closure $next): Response
     {
-        if (Auth::check() && Auth::user()->is_admin) {
-            return $next($request); 
+        if (! $request->user() || ! $request->user()->isAdmin()) {
+            abort(403, 'Acesso restrito à equipe administrativa.');
         }
 
-        abort(403, 'Acesso restrito apenas para administradores.');
+        return $next($request);
     }
 }
 ```
 
 **3. Integração com Controllers (Recuperando a Identidade)**
-Uma vez que o middleware validou o acesso e deixou o usuário passar, o Controller trabalha com a certeza absoluta de que a requisição é confiável. O Controller então pode resgatar facilmente a identidade dessa pessoa para realizar as ações, como gravar os pedidos atrelados a ele.
+
+Uma vez que o middleware validou o acesso, o Controller trabalha com a certeza absoluta de que a requisição é confiável e recupera a identidade do usuário direto da requisição (`$request->user()`).
+
+No `CheckoutController`, essa identidade é o fio condutor de toda a operação: ela localiza o carrinho, garante que o endereço pertence a quem está comprando e amarra o pedido ao dono. Todo o processo roda dentro de uma transação (`DB::transaction`) — se o cupom for inválido ou algo falhar no meio do caminho, nada é gravado.
 
 ```php
 // app/Http/Controllers/CheckoutController.php
-namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Http\Request;
-
-class CheckoutController extends Controller
+public function store(Request $request)
 {
-    public function store(Request $request)
-    {
-        $usuarioAtual = Auth::user();
-        $pedido = $usuarioAtual->pedidos()->create([
-            'total' => $request->total_carrinho,
-            'status' => 'processando'
-        ]);
+    $request->validate([
+        'endereco_id' => 'required|exists:enderecos,id',
+        'metodo_pagamento' => 'required|string',
+        'codigo_cupom' => 'nullable|string',
+    ]);
 
-        return redirect()->route('sucesso');
+    $usuario = $request->user();
+    $carrinho = Carrinho::where('usuario_id', $usuario->id)->with('itens.produto')->first();
+
+    if (! $carrinho || $carrinho->itens->isEmpty()) {
+        return back()->with('error', 'O carrinho está vazio.');
     }
+
+    // Só encontra o endereço se ele pertencer ao usuário logado
+    $endereco = Endereco::where('usuario_id', $usuario->id)->findOrFail($request->endereco_id);
+
+    try {
+        $pedido = DB::transaction(function () use ($usuario, $carrinho, $endereco, $request) {
+            $subtotal = $carrinho->itens->sum(fn ($item) => $item->preco_unitario * $item->quantidade);
+
+            $desconto = 0;
+            $cupom = null;
+
+            if ($request->codigo_cupom) {
+                $cupom = Cupom::where('codigo', $request->codigo_cupom)->first();
+
+                if (! $cupom || ! $cupom->valido()) {
+                    throw new \Exception('Cupom inválido ou expirado.');
+                }
+
+                $desconto = $cupom->calcularDesconto($subtotal);
+            }
+
+            $pedido = Pedido::create([
+                'usuario_id' => $usuario->id,
+                'cupom_id' => $cupom?->id,
+                'subtotal' => $subtotal,
+                'desconto' => $desconto,
+                'frete' => 0,
+                'total' => $subtotal - $desconto,
+                'metodo_pagamento' => $request->metodo_pagamento,
+                'endereco_entrega' => $endereco->only(['rua', 'numero', 'complemento', 'bairro', 'cidade', 'estado', 'cep']),
+            ]);
+
+            foreach ($carrinho->itens as $item) {
+                $pedido->itens()->create([
+                    'produto_id' => $item->produto_id,
+                    'nome_produto' => $item->produto->nome,
+                    'preco_unitario' => $item->preco_unitario,
+                    'quantidade' => $item->quantidade,
+                    'total' => $item->preco_unitario * $item->quantidade,
+                ]);
+
+                $item->produto()->decrement('estoque', $item->quantidade);
+            }
+
+            $carrinho->itens()->delete();
+
+            return $pedido;
+        });
+    } catch (\Exception $e) {
+        return back()->with('error', $e->getMessage());
+    }
+
+    return redirect()->route('pedidos.show', $pedido)->with('success', 'Pedido realizado!');
 }
 ```
+
+> **Resumo do fluxo:** `auth` garante *quem* é o usuário → `IsAdmin` garante *o que* ele pode fazer → o Controller usa `$request->user()` para amarrar cada ação (pedido, endereço, avaliação) ao dono correto, sem precisar confiar em nenhum dado vindo do formulário.
