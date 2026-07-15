@@ -85,7 +85,6 @@ flowchart LR
 // app/Http/Controllers/ProdutoController.php
 public function index()
 {
-    // O 'with' chama o relacionamento definido no Model Produto
     $produtos = Produto::with('categoria')
         ->where('ativo', true)
         ->paginate(12);
@@ -99,114 +98,158 @@ public function index()
 // app/Http/Controllers/CarrinhoController.php
 public function store(Request $request)
 {
-    // Tenta encontrar um carrinho com o ID do usuário ou o ID da Sessão local
-    $carrinho = Carrinho::firstOrCreate([
-        'usuario_id' => Auth::id(), 
-        'sessao_id'  => Auth::check() ? null : session()->getId()
+    // Valida se o produto existe no banco e se a quantidade é um número válido (mínimo 1)
+    $request->validate([
+        'produto_id' => 'required|exists:produtos,id',
+        'quantidade' => 'nullable|integer|min:1'
     ]);
 
-    // Cria o item ou apenas atualiza a quantidade 
-    $carrinho->itens()->updateOrCreate(
-        ['produto_id' => $request->produto_id],
-        [
-            // Se o item já existir, o banco entende e soma a quantidade!
-            'quantidade' => DB::raw("quantidade + {$request->quantidade}"),
-        ]
-    );
+    // Recupera o produto ou retorna erro 404 se não for encontrado
+    $produto = Produto::findOrFail($request->produto_id);
+    $quantidade = $request->input('quantidade', 1);
 
-    return back()->with('sucesso', 'Produto adicionado ao seu carrinho!');
+    // Impede a adição de itens se não houver estoque suficiente
+    if ($quantidade > $produto->estoque) {
+        return back()->with('error', 'Quantidade solicitada maior que o estoque disponível.');
+    }
+    
+    // Busca o carrinho do usuário/sessão atual ou cria um novo caso não exista
+    $carrinho = Carrinho::obterAtual(criarSeNaoExistir: true);
+
+    // Verifica se este produto já está no carrinho atual
+    $item = $carrinho->itens()->where('produto_id', $produto->id)->first();
+
+    if ($item) {
+        $item->increment('quantidade', $quantidade);
+    } else {
+        $carrinho->itens()->create([
+            'produto_id' => $produto->id,
+            'quantidade' => $quantidade,
+            'preco_unitario' => $produto->preco_final,
+        ]);
+    }
+
+    return redirect()->route('carrinho.index')->with('success', 'Produto adicionado ao carrinho.');
+}
+```
+
+**Função de obter o carrinho**
+```php
+public static function obterAtual(bool $criarSeNaoExistir = false): ?self
+{
+    $usuario = Auth::user();
+    $sessaoId = session()->getId();
+
+    // Busca o carrinho pelo ID do usuário (se logado) ou pelo ID da sessão (se visitante)
+    $carrinho = self::where(
+        $usuario ? 'usuario_id' : 'sessao_id',
+        $usuario ? $usuario->id : $sessaoId
+    )->first();
+
+    // Se não encontrar e for solicitado, cria um novo carrinho no banco
+    if (!$carrinho && $criarSeNaoExistir) {
+        $carrinho = self::create([
+            'usuario_id' => $usuario?->id, 
+            'sessao_id'  => $sessaoId,    
+        ]);
+    }
+
+    return $carrinho;
 }
 ```
 
 **3. Validação e Persistência do Pedido (Transação Atômica):**
 ```php
 // app/Http/Controllers/CheckoutController.php
-class CheckoutController extends Controller
+public function store(Request $request)
 {
-    // Exibe a tela de finalização de compra
-    public function index(Request $request)
-    {
-        $carrinho = Carrinho::where('usuario_id',$request->user()->id)->with('itens.produto')->first();
+    $request->validate([
+        'endereco_id' => 'required|exists:enderecos,id',
+        'metodo_pagamento' => 'required|string',
+        'codigo_cupom' => 'nullable|string'
+    ]);
 
-        if (! $carrinho || $carrinho->itens->isEmpty()) {
-            return redirect()->route('carrinho.index')->with('error', 'Seu carrinho está vazio.');
-        }
+    $usuario = $request->user();
+    $carrinho = Carrinho::where('usuario_id', $usuario->id)->with('itens.produto')->first();
 
-        $enderecos = Endereco::where('usuario_id',$request->user()->id)->get();
-        return view('checkout.index', compact('carrinho', 'enderecos'));
+    if (! $carrinho || $carrinho->itens->isEmpty()) {
+        return back()->with('error', 'O carrinho está vazio.');
     }
 
-    // Processa o fechamento do pedido
-    public function store(Request $request)
-    {
-        // Validação local dos dados de entrega e pagamento
-        $request->validate([
-            'endereco_id' => 'required|exists:enderecos,id',
-            'metodo_pagamento' => 'required|string',
-            'codigo_cupom' => 'nullable|string'
-        ]);
+    $endereco = Endereco::where('usuario_id', $usuario->id)->findOrFail($request->endereco_id);
 
-        $usuario = $request->user();
-        $carrinho = Carrinho::where('usuario_id',$usuario->id)->with('itens.produto')->first();
+    try {
+        // Inicia a transação no banco de dados. Se algo falhar aqui dentro, nada é salvo.
+        $pedido = DB::transaction(function () use ($usuario, $carrinho, $endereco, $request) {
+            
+            // Calcula a soma de todos os itens usando o preço unitário guardado no carrinho
+            $subtotal = $carrinho->itens->sum(fn ($item) => $item->preco_unitario * $item->quantidade);
+            $desconto = 0;
+            $cupom = null;
 
-        if (! $carrinho \vert{}\vert{}$carrinho->itens->isEmpty()) {
-            return back()->with('error', 'O carrinho está vazio.');
-        }
+            // Tratamento do Cupom de Desconto (caso tenha sido enviado)
+            if ($request->codigo_cupom) {
+                // O lockForUpdate impede que outros processos alterem este cupom concorrentemente
+                $cupom = Cupom::where('codigo', $request->codigo_cupom)
+                    ->lockForUpdate()
+                    ->first();
 
-        $endereco = Endereco::where('usuario_id', $usuario->id)->findOrFail($request->endereco_id);
-
-        try {
-            // Execução da Transação (Garante consistência total)
-            $pedido = DB::transaction(function () use ($usuario,$carrinho, $endereco,$request) {
-                $subtotal = $carrinho->itens->sum(fn ($item) =>$item->preco_unitario * $item->quantidade);
-                $desconto = 0;
-                $cupom = null;
-
-                // Validação e cálculo do cupom de desconto
-                if ($request->codigo_cupom) {
-                    $cupom = Cupom::where('codigo',$request->codigo_cupom)->first();
-
-                    if (! $cupom || !$cupom->valido()) {
-                        throw new \Exception('Cupom inválido ou expirado.');
-                    }
-
-                    $desconto = $cupom->calcularDesconto($subtotal);
+                if (! $cupom || ! $cupom->valido()) {
+                    throw new \Exception('Cupom inválido ou expirado.');
                 }
 
-                // Criação do registro pedido com o Snapshot do endereço
-                $pedido = Pedido::create([
-                    'usuario_id' => $usuario->id,
-                    'cupom_id' => $cupom?->id,
-                    'subtotal' => $subtotal,
-                    'desconto' => $desconto,
-                    'frete' => 0,
-                    'total' => $subtotal -$desconto,
-                    'metodo_pagamento' => $request->metodo_pagamento,
-                    'endereco_entrega' => $endereco->only(['rua', 'numero', 'complemento', 'bairro', 'cidade', 'estado', 'cep']),
+                $desconto = $cupom->calcularDesconto($subtotal);
+                $cupom->increment('usos'); // Registra o uso do cupom
+            }
+
+            // Criação do cabeçalho do Pedido (com cópia física do endereço de entrega)
+            $pedido = Pedido::create([
+                'usuario_id' => $usuario->id,
+                'cupom_id' => $cupom?->id,
+                'subtotal' => $subtotal,
+                'desconto' => $desconto,
+                'frete' => 0,
+                'total' => $subtotal - $desconto,
+                'metodo_pagamento' => $request->metodo_pagamento,
+                'endereco_entrega' => $endereco->only(['rua', 'numero', 'complemento', 'bairro', 'cidade', 'estado', 'cep']),
+            ]);
+
+            foreach ($carrinho->itens as $item) {
+                // Bloqueia o produto no banco de dados para garantir consistência de estoque
+                $produto = Produto::where('id', $item->produto_id)
+                    ->lockForUpdate()
+                    ->first();
+
+                // Valida se ainda há estoque suficiente antes de finalizar
+                if ($produto->estoque < $item->quantidade) {
+                    throw new \Exception("Estoque insuficiente para \"{$produto->nome}\".");
+                }
+
+                // Cria o registro do item que pertence a este pedido específico
+                $pedido->itens()->create([
+                    'produto_id'     => $item->produto_id,
+                    'nome_produto'   => $produto->nome,
+                    'preco_unitario' => $item->preco_unitario,
+                    'quantidade'     => $item->quantidade,
+                    'total'          => $item->preco_unitario * $item->quantidade,
                 ]);
 
-                // Criação dos itens do pedido com o "Snapshot" dos preços e baixa no estoque
-                foreach ($carrinho->itens as $item) {$pedido->itens()->create([
-                        'produto_id' => $item->produto_id,
-                        'nome_produto' => $item->produto->nome,
-                        'preco_unitario' => $item->preco_unitario, // Histórico de preço congelado aqui
-                        'quantidade' => $item->quantidade,
-                        'total' => $item->preco_unitario * $item->quantidade,
-                    ]);
+                // Baixa o estoque do produto comprado
+                $produto->decrement('estoque', $item->quantidade);
+            }
 
-                    $item->produto()->decrement('estoque',$item->quantidade);
-                }
+            // Esvazia o carrinho do usuário
+            $carrinho->itens()->delete();
 
-                $carrinho->itens()->delete();
-
-                return $pedido;
-            });
-        } catch (\Exception $e) {
-            return back()->with('error', $e->getMessage());
-        }
-
-        return redirect()->route('pedidos.show', $pedido)->with('success', 'Pedido realizado!');
+            return $pedido;
+        });
+        
+    } catch (\Exception $e) {
+        // Se houver qualquer erro/exceção na transação, retorna com a mensagem de erro específica
+        return back()->with('error', $e->getMessage());
     }
+
+    return redirect()->route('pedidos.show', $pedido)->with('success', 'Pedido realizado!');
 }
 
 ```
@@ -225,6 +268,7 @@ erDiagram
     USUARIOS ||--o{ PEDIDOS : "realiza"
     
     CATEGORIAS ||--o{ PRODUTOS : "agrupa"
+    CATEGORIAS ||--o{ CATEGORIAS : "auto-relaciona (parent)"
 
     CARRINHOS ||--o{ ITENS_CARRINHO : "contém"
     PRODUTOS ||--o{ ITENS_CARRINHO : "adicionado em"
@@ -232,59 +276,107 @@ erDiagram
     PEDIDOS ||--o{ ITENS_PEDIDO : "contém"
     PRODUTOS ||--o{ ITENS_PEDIDO : "faz parte de"
 
-    %% Estrutura das Entidades
+    %% Estrutura das Entidades no Padrão MySQL Workbench
     USUARIOS {
-        bigint id PK
-        string name
-        string email
-    }
-    
-    CATEGORIAS {
-        bigint id PK
-        string nome
+        BIGINT_UNSIGNED_AUTO_INCREMENT id PK
+        VARCHAR_255 nome
+        VARCHAR_255 email "UNIQUE"
+        TIMESTAMP email_verified_at "NULL"
+        VARCHAR_255 senha
+        ENUM_cliente_admin perfil "DEFAULT 'cliente'"
+        VARCHAR_255 telefone "NULL"
+        VARCHAR_100 remember_token "NULL"
+        TIMESTAMP created_at "NULL"
+        TIMESTAMP updated_at "NULL"
     }
     
     ENDERECOS {
-        bigint id PK
-        bigint usuario_id FK
-        string cep
+        BIGINT_UNSIGNED_AUTO_INCREMENT id PK
+        BIGINT_UNSIGNED usuario_id FK
+        VARCHAR_9 cep
+        VARCHAR_255 rua "NULL"
+        VARCHAR_50 numero "NULL"
+        VARCHAR_255 complemento "NULL"
+        VARCHAR_255 bairro "NULL"
+        VARCHAR_255 cidade "NULL"
+        VARCHAR_2 estado "NULL"
+        TIMESTAMP created_at "NULL"
+        TIMESTAMP updated_at "NULL"
     }
-    
-    CARRINHOS {
-        bigint id PK
-        bigint usuario_id FK
-        string sessao_id "Visitantes"
-    }
-    
-    PEDIDOS {
-        bigint id PK
-        string uuid
-        bigint usuario_id FK
-        decimal total
-        string status
+
+    CATEGORIAS {
+        BIGINT_UNSIGNED_AUTO_INCREMENT id PK
+        VARCHAR_255 nome
+        VARCHAR_255 slug "UNIQUE"
+        TEXT descricao "NULL"
+        BIGINT_UNSIGNED parent_id FK "NULL"
+        TINYINT_1 ativo "DEFAULT 1"
+        TIMESTAMP created_at "NULL"
+        TIMESTAMP updated_at "NULL"
     }
     
     PRODUTOS {
-        bigint id PK
-        bigint categoria_id FK
-        string nome
-        decimal preco
-        int estoque
+        BIGINT_UNSIGNED_AUTO_INCREMENT id PK
+        BIGINT_UNSIGNED categoria_id FK
+        VARCHAR_255 nome
+        VARCHAR_255 slug "UNIQUE"
+        VARCHAR_255 sku "UNIQUE"
+        TEXT descricao "NULL"
+        DECIMAL_10_2 preco
+        DECIMAL_10_2 preco_promocional "NULL"
+        INT_UNSIGNED estoque "DEFAULT 0"
+        TINYINT_1 ativo "DEFAULT 1"
+        TINYINT_1 destaque "DEFAULT 0"
+        TIMESTAMP created_at "NULL"
+        TIMESTAMP updated_at "NULL"
+        TIMESTAMP deleted_at "NULL"
+    }
+    
+    CARRINHOS {
+        BIGINT_UNSIGNED_AUTO_INCREMENT id PK
+        BIGINT_UNSIGNED usuario_id FK "NULL"
+        VARCHAR_255 sessao_id "NULL"
+        TIMESTAMP created_at "NULL"
+        TIMESTAMP updated_at "NULL"
     }
     
     ITENS_CARRINHO {
-        bigint id PK
-        bigint carrinho_id FK
-        bigint produto_id FK
-        int quantidade
+        BIGINT_UNSIGNED_AUTO_INCREMENT id PK
+        BIGINT_UNSIGNED carrinho_id FK
+        BIGINT_UNSIGNED produto_id FK
+        INT_UNSIGNED quantidade "DEFAULT 1"
+        DECIMAL_10_2 preco_unitario
+        TIMESTAMP created_at "NULL"
+        TIMESTAMP updated_at "NULL"
+    }
+
+    PEDIDOS {
+        BIGINT_UNSIGNED_AUTO_INCREMENT id PK
+        VARCHAR_255 uuid "UNIQUE"
+        BIGINT_UNSIGNED usuario_id FK
+        BIGINT_UNSIGNED cupom_id "NULL"
+        ENUM_status status "DEFAULT 'pendente'"
+        DECIMAL_10_2 subtotal
+        DECIMAL_10_2 desconto "DEFAULT 0.00"
+        DECIMAL_10_2 frete "DEFAULT 0.00"
+        DECIMAL_10_2 total
+        VARCHAR_255 metodo_pagamento "NULL"
+        TIMESTAMP pago_em "NULL"
+        JSON endereco_entrega
+        TIMESTAMP created_at "NULL"
+        TIMESTAMP updated_at "NULL"
     }
     
     ITENS_PEDIDO {
-        bigint id PK
-        bigint pedido_id FK
-        bigint produto_id FK
-        int quantidade
-        decimal preco_unitario
+        BIGINT_UNSIGNED_AUTO_INCREMENT id PK
+        BIGINT_UNSIGNED pedido_id FK
+        BIGINT_UNSIGNED produto_id FK "NULL"
+        VARCHAR_255 nome_produto
+        DECIMAL_10_2 preco_unitario
+        INT_UNSIGNED quantidade
+        DECIMAL_10_2 total
+        TIMESTAMP created_at "NULL"
+        TIMESTAMP updated_at "NULL"
     }
 ```
 
@@ -295,30 +387,47 @@ Esta seção contém exatamente como as tabelas do MER foram construídas utiliz
 
 #### 1. Entidades Base (Usuários, Categorias e Produtos)
 ```php
-Schema::create('users', function (Blueprint $table) {
+// database/migrations/0001_01_01_000000_create_users_table
+Schema::create('usuarios', function (Blueprint $table) {
     $table->id();
-    $table->string('name');
+    $table->string('nome');
     $table->string('email')->unique();
-    $table->string('password');
+    $table->timestamp('email_verified_at')->nullable();
+    $table->string('senha');
+    $table->enum('perfil', ['cliente', 'admin'])->default('cliente');
+    $table->string('telefone')->nullable();
+    $table->rememberToken();
     $table->timestamps();
 });
+```
 
+```php
+// database/migrations/2026_07_03_000846_create_categorias_table
 Schema::create('categorias', function (Blueprint $table) {
     $table->id();
     $table->string('nome');
     $table->string('slug')->unique();
+    $table->text('descricao')->nullable();
+    $table->foreignId('parent_id')->nullable()->constrained('categorias')->onDelete('cascade');
+    $table->boolean('ativo')->default(true);
     $table->timestamps();
 });
+```
 
+```php
+// database/migrations/2026_07_03_001859_create_produtos_table
 Schema::create('produtos', function (Blueprint $table) {
     $table->id();
     $table->foreignId('categoria_id')->constrained('categorias')->cascadeOnDelete();
     $table->string('nome');
     $table->string('slug')->unique();
     $table->string('sku')->unique();
+    $table->text('descricao')->nullable();
     $table->decimal('preco', 10, 2);
+    $table->decimal('preco_promocional', 10, 2)->nullable();
     $table->unsignedInteger('estoque')->default(0);
     $table->boolean('ativo')->default(true);
+    $table->boolean('destaque')->default(false);
     $table->timestamps();
     $table->softDeletes(); 
 });
@@ -326,10 +435,11 @@ Schema::create('produtos', function (Blueprint $table) {
 
 #### 2. Entidades de Fluxo: Carrinho de Compras
 ```php
+// database/migrations/2026_07_03_002842_create_carrinho_table
 Schema::create('carrinhos', function (Blueprint $table) {
     $table->id();
     $table->foreignId('usuario_id')->nullable()->constrained('usuarios')->cascadeOnDelete();
-    $table->string('sessao_id')->nullable()->index();
+    $table->string('sessao_id')->nullable()->index(); // usado por visitantes
     $table->timestamps();
 });
 
@@ -338,22 +448,28 @@ Schema::create('itens_carrinho', function (Blueprint $table) {
     $table->foreignId('carrinho_id')->constrained('carrinhos')->cascadeOnDelete();
     $table->foreignId('produto_id')->constrained('produtos')->cascadeOnDelete();
     $table->unsignedInteger('quantidade')->default(1);
-    $table->decimal('preco_unitario', 10, 2);
+    $table->decimal('preco_unitario', 10, 2); // preço no momento
     $table->timestamps();
-    $table->unique(['carrinho_id', 'produto_id']); 
+    $table->unique(['carrinho_id', 'produto_id']); // não duplica o mesmo produto no carrinho
 });
 ```
 
 #### 3. Entidades de Consumação: Pedidos Financeiros
 ```php
+// database/migrations/2026_07_03_003411_create_pedidos_table
 Schema::create('pedidos', function (Blueprint $table) {
     $table->id();
-    $table->string('uuid')->unique(); 
+    $table->string('uuid')->unique(); // identificador público (não mostra o id sequencial)
     $table->foreignId('usuario_id')->constrained('usuarios')->cascadeOnDelete();
+    $table->foreignId('cupom_id')->nullable();
     $table->enum('status', ['pendente', 'pago', 'processando', 'enviado', 'entregue', 'cancelado'])->default('pendente');
     $table->decimal('subtotal', 10, 2);
+    $table->decimal('desconto', 10, 2)->default(0);
+    $table->decimal('frete', 10, 2)->default(0);
     $table->decimal('total', 10, 2);
-    $table->json('endereco_entrega'); 
+    $table->string('metodo_pagamento')->nullable();
+    $table->timestamp('pago_em')->nullable();
+    $table->json('endereco_entrega'); // snapshot do endereço no momento da compra
     $table->timestamps();
 });
 
@@ -361,8 +477,8 @@ Schema::create('itens_pedido', function (Blueprint $table) {
     $table->id();
     $table->foreignId('pedido_id')->constrained('pedidos')->cascadeOnDelete();
     $table->foreignId('produto_id')->nullable()->constrained('produtos')->nullOnDelete();
-    $table->string('nome_produto');   
-    $table->decimal('preco_unitario', 10, 2); 
+    $table->string('nome_produto');   // nome do produto na hora da compra
+    $table->decimal('preco_unitario', 10, 2);
     $table->unsignedInteger('quantidade');
     $table->decimal('total', 10, 2);
     $table->timestamps();
