@@ -50,7 +50,6 @@ class CouponSeeder extends Seeder
                 'expira_em' => now()->addMonths(2),
                 'ativo' => true,
             ],
-            // Cupom expirado, útil para testar a validação de cupons inválidos.
             [
                 'codigo' => 'PROMOANTIGA',
                 'tipo' => 'porcentagem',
@@ -59,7 +58,6 @@ class CouponSeeder extends Seeder
                 'expira_em' => now()->subMonth(),
                 'ativo' => true,
             ],
-            // Cupom desativado manualmente, também útil para testes.
             [
                 'codigo' => 'DESATIVADO5',
                 'tipo' => 'porcentagem',
