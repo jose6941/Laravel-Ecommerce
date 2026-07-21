@@ -29,7 +29,7 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('checkout', CheckoutController::class)->only(['index', 'store']);
 
-    Route::resource('pedidos', PedidoController::class)->only(['show']);
+    Route::resource('pedidos', PedidoController::class)->only(['index', 'show']);
 
     Route::resource('enderecos', EnderecoController::class)->only(['store', 'destroy']);
 
@@ -39,7 +39,7 @@ Route::middleware('auth')->group(function () {
 
     Route::middleware([\App\Http\Middleware\IsAdmin::class])->prefix('admin')->name('admin.')->group(function () {
         Route::get('/', [PainelController::class, 'index'])->name('dashboard');
-        Route::resource('produtos', AdminProdutoController::class)->only(['index', 'edit', 'update']);
+        Route::resource('produtos', AdminProdutoController::class)->only(['index', 'edit', 'update', 'destroy']);
     });
 });
 
