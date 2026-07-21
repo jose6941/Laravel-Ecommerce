@@ -66,8 +66,8 @@
                             <p class="font-bold text-lg text-[#1a1a1a]">{{ App\Models\Pedido::where('usuario_id', Auth::id())->count() }}</p>
                         </div>
                     </div>
-                    <a href="{{ route('produtos.index') }}" class="text-xs font-semibold text-[#1a1a1a] hover:underline flex items-center gap-1">
-                        Explorar produtos
+                    <a href="{{ route('pedidos.index') }}" class="text-xs font-semibold text-[#1a1a1a] hover:underline flex items-center gap-1">
+                        Ver histórico
                         <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                         </svg>
