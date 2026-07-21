@@ -7,6 +7,7 @@ use App\Models\Carrinho;
 use App\Models\Endereco;
 use App\Models\Pedido;
 use App\Models\Cupom;
+use App\Models\Produto;
 use Illuminate\Support\Facades\DB;
 
 class CheckoutController extends Controller
@@ -49,13 +50,16 @@ class CheckoutController extends Controller
                 $cupom = null;
 
                 if ($request->codigo_cupom) {
-                    $cupom = Cupom::where('codigo', $request->codigo_cupom)->first();
+                    $cupom = Cupom::where('codigo', $request->codigo_cupom)
+                        ->lockForUpdate()
+                        ->first();
 
                     if (! $cupom || ! $cupom->valido()) {
                         throw new \Exception('Cupom inválido ou expirado.');
                     }
 
                     $desconto = $cupom->calcularDesconto($subtotal);
+                    $cupom->increment('usos'); // <-- faltava isso
                 }
 
                 $pedido = Pedido::create([
@@ -70,15 +74,23 @@ class CheckoutController extends Controller
                 ]);
 
                 foreach ($carrinho->itens as $item) {
+                    $produto = Produto::where('id', $item->produto_id)
+                        ->lockForUpdate()
+                        ->first();
+
+                    if ($produto->estoque < $item->quantidade) {
+                        throw new \Exception("Estoque insuficiente para \"{$produto->nome}\".");
+                    }
+
                     $pedido->itens()->create([
-                        'produto_id' => $item->produto_id,
-                        'nome_produto' => $item->produto->nome,
+                        'produto_id'     => $item->produto_id,
+                        'nome_produto'   => $produto->nome,
                         'preco_unitario' => $item->preco_unitario,
-                        'quantidade' => $item->quantidade,
-                        'total' => $item->preco_unitario * $item->quantidade,
+                        'quantidade'     => $item->quantidade,
+                        'total'          => $item->preco_unitario * $item->quantidade,
                     ]);
 
-                    $item->produto()->decrement('estoque', $item->quantidade);
+                    $produto->decrement('estoque', $item->quantidade);
                 }
 
                 $carrinho->itens()->delete();
