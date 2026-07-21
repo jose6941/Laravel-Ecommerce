@@ -42,6 +42,8 @@
                         <div x-show="dropdownOpen" @click.away="dropdownOpen = false" class="absolute right-0 mt-2 w-48 bg-white border border-gray-100 rounded-2xl shadow-xl py-1 z-50 text-dark overflow-hidden" style="display: none;">
                             @if (Auth::user()->isAdmin())
                                 <a href="{{ route('admin.dashboard') }}" class="block px-4 py-2 text-sm hover:bg-gray-50">Painel Admin</a>
+                            @else
+                                <a href="{{ route('dashboard') }}" class="block px-4 py-2 text-sm hover:bg-gray-50">Painel do Usuário</a>
                             @endif
                             <a href="{{ route('profile.edit') }}" class="block px-4 py-2 text-sm hover:bg-gray-50">Meu Perfil</a>
                             <form method="POST" action="{{ route('logout') }}">
